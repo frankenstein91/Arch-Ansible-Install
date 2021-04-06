@@ -1,0 +1,106 @@
+# Create partitions and set up filesystem
+
+# TODO Check install device
+#  -> ansible_facts.devices lists all devices...
+
+- name: Check swap size to avoid problems
+  set_fact:
+    swap_size: 0
+  when: swap_size<0
+  tags:
+    - arch2disk
+    - partitioning
+    - quick_exit
+
+- name: Create Swap partition
+  parted:
+    device: "{{ install_device }}"
+    label: gpt  # Wipes partition table if it's not GPT currently
+    state: present
+    number: 1
+    name: Swap partition
+    fs_type: linux-swap
+    part_end: "{{ swap_size }}MiB"
+  when: swap_size!=0  # Only create SWAP when size>0
+  tags:
+    - arch2disk
+    - partitioning
+
+- name: Create EFI partition
+  parted:
+    device: "{{ install_device }}"
+    label: gpt
+    state: present
+    number: 2
+    name: EFI System Partition
+    fs_type: fat32
+    flags: [ esp, boot ]
+    # Start right after swap partition
+    part_start: "{{ swap_size }}MiB"
+    part_end: "{{ swap_size + efi_size }}MiB"
+  tags:
+    - arch2disk
+    - partitioning
+
+- name: Create root partition
+  parted:
+    device: "{{ install_device }}"
+    label: gpt
+    state: present
+    number: 3
+    name: ArchLinux root partition
+    fs_type: btrfs
+    # Start right after EFI partition
+    part_start: "{{ swap_size + efi_size }}MiB"
+    # Fill the device
+    part_end: "100%"
+  tags:
+    - arch2disk
+    - partitioning
+
+# Create filesystems...........................................................
+- name: Format swap partition
+  filesystem:
+    dev: "{{ install_device }}1"
+    fstype: swap
+    force: yes
+  tags:
+    - arch2disk
+    - partitioning
+
+# By shell because Ansible doesn't support fat32 according to documentation
+- name: Format EFI partition FAT32
+  filesystem:
+    dev: '{{ install_drive }}{{ boot_partition_suffix }}'
+    fstype: vfat
+    opts: -F32
+    force: yes
+  tags:
+  - arch2disk
+  - partitioning
+
+- name: Format root partition
+  filesystem:
+    dev: "{{ install_device }}"
+    fstype: btrfs
+    force: yes
+  tags:
+  - arch2disk
+  - partitioning
+
+# TODO create BTRFS subvolumes
+
+#create subvols
+# mount -t btrfs /dev/sda3 /mnt
+# cd /mnt
+# btrfs subvolume create root
+# btrfs subvolume create home
+# btrfs subvolume create snapshots
+# btrfs subvolume create tmp
+# umount /mnt
+
+# TODO mount everything
+# mount -o subvol=root,compress-force=zstd:6,space_cache,noatime,X-mount.mkdir,defaults /dev/sda3 /mnt
+# mount -o subvol=home,compress-force=zstd:6,space_cache,noatime,X-mount.mkdir,defaults,nodev /dev/sda3 /mnt/home
+# mount -o subvol=tmp,compress-force=zstd:6,space_cache,noatime,X-mount.mkdir,defaults,nodev,nosuid /dev/sda3 /mnt/tmp
+# mount -o subvol=snapshots,compress-force=zstd:6,space_cache,noatime,X-mount.mkdir,defaults /dev/sda3 /mnt/run/snapshots

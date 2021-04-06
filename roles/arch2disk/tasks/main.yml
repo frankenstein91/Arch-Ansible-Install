@@ -13,7 +13,11 @@
     - arch2disk
     - sync_clock
 
-# TODO: partition, filesystems, ...
+- name: Include partitioning tasks
+  include_tasks: partitioning.yml
+  tags:
+    - arch2disk
+    - partitioning
 
 # Rank possible Arch mirrors before system packages are downloaded
 - name: Rank Arch mirrors
@@ -29,7 +33,8 @@
     - arch2disk
     - mirrors
 
-# TODO: the actual system install (pacstrap) inklude backup on update https://github.com/wesbarnett/snap-pac
+# TODO: the actual system install (pacstrap)
+# include backup on update https://github.com/wesbarnett/snap-pac
 
 # TODO: fstab and further filesystem things
 

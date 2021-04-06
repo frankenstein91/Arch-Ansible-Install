@@ -1,0 +1,10 @@
+# GENERAL =====================================================================
+# Where to install ArchLinux to (block device, e.g. /dev/sda)
+install_device: /dev/sda
+
+# PARTITIONS AND FILESYSTEM ===================================================
+# Swap partition size in MiB
+# Set to 0 to disable swap
+swap_size: "{{ ansible_facts['ansible_memtotal_mb'] }}"
+# EFI partition size in Mib
+efi_size: 1000
