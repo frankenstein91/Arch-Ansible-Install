@@ -9,3 +9,7 @@ On Hostsystem:
 4. pikaur -S ansible
 
 5. pikaur -S ansible-aur-git
+
+6. Boot archiso on target system
+
+7. ansible-playbook -i inventory.yml playbook.yml

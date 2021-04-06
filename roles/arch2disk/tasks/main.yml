@@ -1,0 +1,21 @@
+- name: Abort if the host is not booted from the Arch install media
+  fail:
+    msg: "This host is not booted from the Arch install media!"
+  when: ansible_nodename != 'archiso'
+  tags:
+    - quick_exit
+- name: Synchronize clock via NTP
+  command: timedatectl set-ntp true
+  tags:
+    - sync_clock
+- name: Rank Arch mirrors
+  block:
+    - name: Install the pacman-contrib package (for rankmirrors)
+      pacman:
+        name:
+          - pacman-contrib
+        update_cache: yes
+    - name: Use rankmirrors to filter the fastest mirrors that support HTTPS
+      shell: curl -s "https://archlinux.org/mirrorlist/?protocol=https&use_mirror_status=on" | sed -e 's/^#Server/Server/' -e '/^#/d' | rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
+  tags:
+    - mirrors
