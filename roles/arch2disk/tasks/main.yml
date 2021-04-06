@@ -1,13 +1,21 @@
+# This task should warrant idempotency, which is always assumed by Ansible
 - name: Abort if the host is not booted from the Arch install media
   fail:
     msg: "This host is not booted from the Arch install media!"
   when: ansible_nodename != 'archiso'
   tags:
+    - arch2disk
     - quick_exit
+
 - name: Synchronize clock via NTP
   command: timedatectl set-ntp true
   tags:
+    - arch2disk
     - sync_clock
+
+# TODO: partition, filesystems, ...
+
+# Rank possible Arch mirrors before system packages are downloaded
 - name: Rank Arch mirrors
   block:
     - name: Install the pacman-contrib package (for rankmirrors)
@@ -18,4 +26,19 @@
     - name: Use rankmirrors to filter the fastest mirrors that support HTTPS
       shell: curl -s "https://archlinux.org/mirrorlist/?protocol=https&use_mirror_status=on" | sed -e 's/^#Server/Server/' -e '/^#/d' | rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
   tags:
+    - arch2disk
     - mirrors
+
+# TODO: the actual system install (pacstrap) inklude backup on update https://github.com/wesbarnett/snap-pac
+
+# TODO: fstab and further filesystem things
+
+# TODO: timezone, locals, ...
+
+# TODO: add initial user with posible SSH key login + sudo, root passwd
+
+# TODO: setup network + sshd
+
+# TODO: initramfs
+
+# TODO: UEFI/bootloader
