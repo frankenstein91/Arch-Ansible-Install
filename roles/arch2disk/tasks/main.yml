@@ -41,6 +41,7 @@
     | sed -e 's/^#Server/Server/' -e '/^#/d'
     | rankmirrors -n 5 -
     > /etc/pacman.d/mirrorlist
+  warn: false  # ?
   tags:
     - arch2disk
     - mirrors
@@ -53,13 +54,14 @@
 
 # I now about the Ansible module to do this
 # But that would need about a thousands lines more, and is more error-prone
+# TODO this didn't work in test...
 - name: Generate fstab
-  command: genfstab -U /mnt >> /mnt/etc/fstab
+  shell: genfstab -U /mnt >> /mnt/etc/fstab
   tags:
     - arch2disk
     - fstab
 
-# TODO: fstab and further filesystem things
+# TODO: further filesystem things
 
 # TODO chroot for the following steps
 
