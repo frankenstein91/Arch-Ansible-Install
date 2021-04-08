@@ -5,7 +5,7 @@ install_device: /dev/sda
 # PARTITIONS AND FILESYSTEM ===================================================
 # Swap partition size in MiB
 # Set to 0 to disable swap
-swap_size: "{{ ansible_facts['ansible_memtotal_mb'] }}"
+swap_size: "{{ ansible_facts['memtotal_mb'] }}"
 # EFI partition size in Mib
 efi_size: 1000
 # Btrfs: transparent zstd compression level (integer, 1-9)
