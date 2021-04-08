@@ -1,0 +1,80 @@
+# This task should warrant idempotency, which is always assumed by Ansible
+- name: Abort if the host is not booted from the Arch install media
+  fail:
+    msg: "This host is not booted from the Arch install media!"
+  when: ansible_nodename != 'archiso'
+  tags:
+    - arch2disk
+    - quick_exit
+
+# TODO Check UEFI/BIOS boot...
+# - Differentiate between these two
+# - Set as a fact what the system is booted with
+# - Allow only one by variable, or both by default)
+# - Adjust partitioning and boot loader installation
+#    - Currently only efi implementation
+#    - BIOS: https://gist.github.com/TimL20/38d323853e2b72ae5d9a3537bb841be4
+# Maybe put that in an separate task file with the media boot check (?)
+
+- name: Synchronize clock via NTP
+  command: timedatectl set-ntp true
+  tags:
+    - arch2disk
+    - sync_clock
+
+- name: Include partitioning tasks
+  include_tasks: partitioning.yml
+  tags:
+    - arch2disk
+    - partitioning
+
+- name: Update pacman DB and install rankmirrors
+  pacman:
+    name: pacman-contrib
+    update_cache: yes  # Update pacman database, also needed for pacstrap
+  tags:
+    - arch2disk
+
+- name: Use rankmirrors to filter the fastest mirrors that support HTTPS
+  shell: >
+    curl -s "https://archlinux.org/mirrorlist/?protocol=https&use_mirror_status=on&country={{ locale_country|upper }}"
+    | sed -e 's/^#Server/Server/' -e '/^#/d'
+    | rankmirrors -n 5 -
+    > /etc/pacman.d/mirrorlist
+  warn: false  # ?
+  tags:
+    - arch2disk
+    - mirrors
+
+- name: Install base system to new root
+  command: pacstrap /mnt base base-devel efibootmgr efitools linux linux-firmware openssh python sudo dosfstools btrfs-progs wget git
+  tags:
+    - arch2disk
+    - pacstrap
+
+# I now about the Ansible module to do this
+# But that would need about a thousands lines more, and is more error-prone
+# TODO this didn't work in test...
+- name: Generate fstab
+  shell: genfstab -U /mnt >> /mnt/etc/fstab
+  tags:
+    - arch2disk
+    - fstab
+
+# TODO: further filesystem things
+
+# TODO chroot for the following steps
+
+# TODO install other packages as needed
+# Network manager
+# intel-ucode (?)
+
+# TODO: timezone, locals, ...
+
+# TODO: add initial user with posible SSH key login + sudo, root passwd
+
+# TODO: setup network + sshd
+
+# TODO: initramfs
+
+# TODO: UEFI/bootloader

@@ -1,0 +1,145 @@
+#==============================================================================
+# Create partitions and set up filesystem
+#==============================================================================
+
+# TODO Check install device
+#  -> ansible_facts.devices lists all devices...
+
+# Set some default facts to avoid code replication (default filter)
+# TODO maybe move these up???
+- name: Set partitioning fact defaults
+  set_fact:
+    root_partition: "{{ install_device }}3"
+  tags:
+    - arch2disk
+    - partitioning
+
+# This task is here to avoid problems
+- name: Check swap size
+  set_fact:
+    swap_size: 0
+  when: swap_size|int<0
+  tags:
+    - arch2disk
+    - partitioning
+    - quick_exit
+
+- name: Create Swap partition
+  parted:
+    device: "{{ install_device }}"
+    label: gpt  # Wipes partition table if it's not GPT currently
+    state: present
+    number: 1
+    name: Swap partition
+    fs_type: linux-swap
+    part_end: "{{ swap_size }}MiB"
+  when: swap_size|int>0  # Only create SWAP when size>0
+  tags:
+    - arch2disk
+    - partitioning
+
+- name: Create EFI partition
+  parted:
+    device: "{{ install_device }}"
+    label: gpt
+    state: present
+    number: 2
+    name: EFI System Partition
+    fs_type: fat32
+    flags: [ esp, boot ]
+    # Start right after swap partition
+    part_start: "{{ swap_size }}MiB"
+    part_end: "{{ swap_size|int + efi_size|int }}MiB"
+  tags:
+    - arch2disk
+    - partitioning
+
+- name: Create root partition
+  parted:
+    device: "{{ install_device }}"
+    label: gpt
+    state: present
+    number: 3
+    name: ArchLinux root partition
+    fs_type: btrfs
+    # Start right after EFI partition
+    part_start: "{{ swap_size|int + efi_size|int }}MiB"
+    # Fill the device
+    part_end: "100%"
+  tags:
+    - arch2disk
+    - partitioning
+
+# Format ......................................................................
+- name: Format swap partition
+  filesystem:
+    dev: "{{ install_device }}1"
+    fstype: swap
+    force: yes
+  tags:
+    - arch2disk
+    - partitioning
+
+- name: Format EFI partition FAT32
+  filesystem:
+    dev: '{{ install_device }}2'
+    fstype: vfat
+    opts: -F32
+    force: yes
+  tags:
+  - arch2disk
+  - partitioning
+
+- name: Format root partition
+  filesystem:
+    dev: "{{ root_partition }}"
+    fstype: btrfs
+    force: yes
+  tags:
+  - arch2disk
+  - partitioning
+
+# Create BTRFS subvolumes .....................................................
+# As far as I can see, there is no Ansible module achieving any of this...
+- name: Create subvolumes
+  shell: |
+      mount -t btrfs {{ root_partition }} /mnt
+      cd /mnt
+      btrfs subvolume create root
+      btrfs subvolume create home
+      btrfs subvolume create snapshots
+      btrfs subvolume create tmp
+      cd /
+      umount /mnt
+  tags:
+    - arch2disk
+    - partitioning
+
+- name: Mount everything
+  shell: >
+      mount -o subvol=root,compress-force=zstd:{{ btrfs_compression_level }},space_cache,noatime,X-mount.mkdir,defaults
+      {{ root_partition }} /mnt
+
+      mount -o subvol=home,compress-force=zstd:{{ btrfs_compression_level }},space_cache,noatime,X-mount.mkdir,defaults,nodev
+      {{ root_partition }} /mnt/home
+
+      mount -o subvol=tmp,compress-force=zstd:{{ btrfs_compression_level }},space_cache,noatime,X-mount.mkdir,defaults,nodev,nosuid
+      {{ root_partition }} /mnt/tmp
+
+      mkdir -p /mnt/run
+
+      mount -o subvol=snapshots,compress-force=zstd:{{ btrfs_compression_level }},space_cache,noatime,X-mount.mkdir,defaults
+      {{ root_partition }} /mnt/run/snapshots
+
+      mount -o X-mount.mkdir,nodev
+      {{ install_device }}2 /mnt/boot
+  tags:
+    - arch2disk
+    - partitioning
+
+- name: Enable swap
+  command: swapon {{ install_device }}1
+  when: swap_size|int>0
+  tags:
+    - arch2disk
+    - partitioning
