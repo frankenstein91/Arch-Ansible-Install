@@ -10,3 +10,7 @@ swap_size: "{{ ansible_facts['memtotal_mb'] }}"
 efi_size: 1000
 # Btrfs: transparent zstd compression level (integer, 1-9)
 btrfs_compression_level: 6
+
+# Localization ================================================================
+# Code of your country, e.g. "de" or "fr"
+locale_country: de

@@ -28,24 +28,44 @@
     - arch2disk
     - partitioning
 
-# Rank possible Arch mirrors before system packages are downloaded
-- name: Rank Arch mirrors
-  block:
-    - name: Install the pacman-contrib package (for rankmirrors)
-      pacman:
-        name:
-          - pacman-contrib
-        update_cache: yes
-    - name: Use rankmirrors to filter the fastest mirrors that support HTTPS
-      shell: curl -s "https://archlinux.org/mirrorlist/?protocol=https&use_mirror_status=on" | sed -e 's/^#Server/Server/' -e '/^#/d' | rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
+- name: Update pacman DB and install rankmirrors
+  pacman:
+    name: pacman-contrib
+    update_cache: yes  # Update pacman database, also needed for pacstrap
+  tags:
+    - arch2disk
+
+- name: Use rankmirrors to filter the fastest mirrors that support HTTPS
+  shell: >
+    curl -s "https://archlinux.org/mirrorlist/?protocol=https&use_mirror_status=on&country={{ locale_country|upper }}"
+    | sed -e 's/^#Server/Server/' -e '/^#/d'
+    | rankmirrors -n 5 -
+    > /etc/pacman.d/mirrorlist
   tags:
     - arch2disk
     - mirrors
 
-# TODO: the actual system install (pacstrap)
-# include backup on update https://github.com/wesbarnett/snap-pac
+- name: Install base system to new root
+  command: pacstrap /mnt base base-devel efibootmgr efitools linux linux-firmware openssh python sudo dosfstools btrfs-progs wget git
+  tags:
+    - arch2disk
+    - pacstrap
+
+# I now about the Ansible module to do this
+# But that would need about a thousands lines more, and is more error-prone
+- name: Generate fstab
+  command: genfstab -U /mnt >> /mnt/etc/fstab
+  tags:
+    - arch2disk
+    - fstab
 
 # TODO: fstab and further filesystem things
+
+# TODO chroot for the following steps
+
+# TODO install other packages as needed
+# Network manager
+# intel-ucode (?)
 
 # TODO: timezone, locals, ...
 
