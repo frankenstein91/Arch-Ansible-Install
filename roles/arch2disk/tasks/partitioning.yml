@@ -18,7 +18,7 @@
 - name: Check swap size
   set_fact:
     swap_size: 0
-  when: swap_size<0
+  when: swap_size|int<0
   tags:
     - arch2disk
     - partitioning
@@ -33,7 +33,7 @@
     name: Swap partition
     fs_type: linux-swap
     part_end: "{{ swap_size }}MiB"
-  when: swap_size>0  # Only create SWAP when size>0
+  when: swap_size|int>0  # Only create SWAP when size>0
   tags:
     - arch2disk
     - partitioning
@@ -49,7 +49,7 @@
     flags: [ esp, boot ]
     # Start right after swap partition
     part_start: "{{ swap_size }}MiB"
-    part_end: "{{ swap_size + efi_size }}MiB"
+    part_end: "{{ swap_size|int + efi_size|int }}MiB"
   tags:
     - arch2disk
     - partitioning
@@ -63,7 +63,7 @@
     name: ArchLinux root partition
     fs_type: btrfs
     # Start right after EFI partition
-    part_start: "{{ swap_size + efi_size }}MiB"
+    part_start: "{{ swap_size|int + efi_size|int }}MiB"
     # Fill the device
     part_end: "100%"
   tags:
@@ -139,7 +139,7 @@
 
 - name: Enable swap
   command: swapon {{ install_device }}1
-  when: swap_size>0
+  when: swap_size|int>0
   tags:
     - arch2disk
     - partitioning
