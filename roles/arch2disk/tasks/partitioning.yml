@@ -9,7 +9,7 @@
 # TODO maybe move these up???
 - name: Set partitioning fact defaults
   set_fact:
-    root_partition: "{{ install_drive }}3"
+    root_partition: "{{ install_device }}3"
   tags:
     - arch2disk
     - partitioning
@@ -82,7 +82,7 @@
 
 - name: Format EFI partition FAT32
   filesystem:
-    dev: '{{ install_drive }}2'
+    dev: '{{ install_device }}2'
     fstype: vfat
     opts: -F32
     force: yes
@@ -132,7 +132,7 @@
       {{ root_partition }} /mnt/run/snapshots
 
       mount -o X-mount.mkdir,nodev
-      {{ install_drive }}2 /mnt/boot
+      {{ install_device }}2 /mnt/boot
   tags:
     - arch2disk
     - partitioning
