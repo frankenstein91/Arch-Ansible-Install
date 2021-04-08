@@ -7,6 +7,15 @@
     - arch2disk
     - quick_exit
 
+# TODO Check UEFI/BIOS boot...
+# - Differentiate between these two
+# - Set as a fact what the system is booted with
+# - Allow only one by variable, or both by default)
+# - Adjust partitioning and boot loader installation
+#    - Currently only efi implementation
+#    - BIOS: https://gist.github.com/TimL20/38d323853e2b72ae5d9a3537bb841be4
+# Maybe put that in an separate task file with the media boot check (?)
+
 - name: Synchronize clock via NTP
   command: timedatectl set-ntp true
   tags:

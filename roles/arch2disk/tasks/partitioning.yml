@@ -1,9 +1,21 @@
+#==============================================================================
 # Create partitions and set up filesystem
+#==============================================================================
 
 # TODO Check install device
 #  -> ansible_facts.devices lists all devices...
 
-- name: Check swap size to avoid problems
+# Set some default facts to avoid code replication (default filter)
+# TODO maybe move these up???
+- name: Set partitioning fact defaults
+  set_fact:
+    root_partition: "{{ install_drive }}3"
+  tags:
+    - arch2disk
+    - partitioning
+
+# This task is here to avoid problems
+- name: Check swap size
   set_fact:
     swap_size: 0
   when: swap_size<0
@@ -21,7 +33,7 @@
     name: Swap partition
     fs_type: linux-swap
     part_end: "{{ swap_size }}MiB"
-  when: swap_size!=0  # Only create SWAP when size>0
+  when: swap_size>0  # Only create SWAP when size>0
   tags:
     - arch2disk
     - partitioning
@@ -58,7 +70,7 @@
     - arch2disk
     - partitioning
 
-# Create filesystems...........................................................
+# Format ......................................................................
 - name: Format swap partition
   filesystem:
     dev: "{{ install_device }}1"
@@ -68,10 +80,9 @@
     - arch2disk
     - partitioning
 
-# By shell because Ansible doesn't support fat32 according to documentation
 - name: Format EFI partition FAT32
   filesystem:
-    dev: '{{ install_drive }}{{ boot_partition_suffix }}'
+    dev: '{{ install_drive }}2'
     fstype: vfat
     opts: -F32
     force: yes
@@ -81,26 +92,54 @@
 
 - name: Format root partition
   filesystem:
-    dev: "{{ install_device }}"
+    dev: "{{ root_partition }}"
     fstype: btrfs
     force: yes
   tags:
   - arch2disk
   - partitioning
 
-# TODO create BTRFS subvolumes
+# Create BTRFS subvolumes .....................................................
+# As far as I can see, there is no Ansible module achieving any of this...
+- name: Create subvolumes
+  shell: |
+      mount -t btrfs {{ root_partition }} /mnt
+      cd /mnt
+      btrfs subvolume create root
+      btrfs subvolume create home
+      btrfs subvolume create snapshots
+      btrfs subvolume create tmp
+      cd /
+      umount /mnt
+  tags:
+    - arch2disk
+    - partitioning
 
-#create subvols
-# mount -t btrfs /dev/sda3 /mnt
-# cd /mnt
-# btrfs subvolume create root
-# btrfs subvolume create home
-# btrfs subvolume create snapshots
-# btrfs subvolume create tmp
-# umount /mnt
+- name: Mount everything
+  shell: >
+      mount -o subvol=root,compress-force=zstd:{{ btrfs_compression_level }},space_cache,noatime,X-mount.mkdir,defaults
+      {{ root_partition }} /mnt
 
-# TODO mount everything
-# mount -o subvol=root,compress-force=zstd:6,space_cache,noatime,X-mount.mkdir,defaults /dev/sda3 /mnt
-# mount -o subvol=home,compress-force=zstd:6,space_cache,noatime,X-mount.mkdir,defaults,nodev /dev/sda3 /mnt/home
-# mount -o subvol=tmp,compress-force=zstd:6,space_cache,noatime,X-mount.mkdir,defaults,nodev,nosuid /dev/sda3 /mnt/tmp
-# mount -o subvol=snapshots,compress-force=zstd:6,space_cache,noatime,X-mount.mkdir,defaults /dev/sda3 /mnt/run/snapshots
+      mount -o subvol=home,compress-force=zstd:{{ btrfs_compression_level }},space_cache,noatime,X-mount.mkdir,defaults,nodev
+      {{ root_partition }} /mnt/home
+
+      mount -o subvol=tmp,compress-force=zstd:{{ btrfs_compression_level }},space_cache,noatime,X-mount.mkdir,defaults,nodev,nosuid
+      {{ root_partition }} /mnt/tmp
+
+      mkdir -p /mnt/run
+
+      mount -o subvol=snapshots,compress-force=zstd:{{ btrfs_compression_level }},space_cache,noatime,X-mount.mkdir,defaults
+      {{ root_partition }} /mnt/run/snapshots
+
+      mount -o X-mount.mkdir,nodev
+      {{ install_drive }}2 /mnt/boot
+  tags:
+    - arch2disk
+    - partitioning
+
+- name: Enable swap
+  command: swapon {{ install_device }}1
+  when: swap_size>0
+  tags:
+    - arch2disk
+    - partitioning

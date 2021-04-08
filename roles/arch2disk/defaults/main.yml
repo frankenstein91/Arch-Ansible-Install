@@ -8,3 +8,5 @@ install_device: /dev/sda
 swap_size: "{{ ansible_facts['ansible_memtotal_mb'] }}"
 # EFI partition size in Mib
 efi_size: 1000
+# Btrfs: transparent zstd compression level (integer, 1-9)
+btrfs_compression_level: 6
