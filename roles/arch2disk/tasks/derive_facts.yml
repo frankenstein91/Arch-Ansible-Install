@@ -44,6 +44,8 @@
   tags:
     - arch2disk
 
+# Timezone ....................................................................
+
 - name: Get local timezone if timezone var is not set
   stat:
     path: /etc/localtime
@@ -65,8 +67,11 @@
     - set_time
     - localization
 
+# Keymap ......................................................................
+
 - name: Try to find out host keymap
   command: localectl status
+  delegate_to: localhost
   failed_when: false
   changed_when: false
   when: keymap|default('', true)|length == 0
@@ -82,6 +87,18 @@
   tags:
     - arch2disk
     - keymap
+
+# Empty keymap = no vconsole = mkinitcpio error
+- name: Check keymap
+  fail:
+    msg: Keymap setting required
+  when: keymap|default('', true)|length == 0
+  tags:
+    - arch2disk
+    - keymap
+    - quick_exit
+
+# Hostname ....................................................................
 
 - name: Generate default hostname if not set
   shell: cat /sys/class/net/*/address | sha512sum | head -c 10
@@ -101,6 +118,7 @@
     - networking
     - hostname
 
+# Various .....................................................................
 - name: Set some facts
   set_fact:
     # Find out CPU vendor for microcode
@@ -114,6 +132,7 @@
   tags:
     - arch2disk
 
+# Bootloader ..................................................................
 - name: Check bootloader var
   fail:
     msg: The specified bootloader is not supported by this role
@@ -124,6 +143,7 @@
       # - grub  # Planned to be supported in the future
   when: bootloader not in supported
 
+# Partition sizes .............................................................
 # This task is needed to avoid problems
 - name: Check swap size
   set_fact:

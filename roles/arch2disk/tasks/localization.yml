@@ -45,13 +45,13 @@
     - localization
     - locales
 
+- name: Set keymap
   template:
     dest: /mnt/etc/vconsole.conf
     src: etc/vconsole.conf
     mode: 0644
     group: root
     owner: root
-  when: keymap|default('', true)|length == 0
   tags:
     - arch2disk
     - localization
