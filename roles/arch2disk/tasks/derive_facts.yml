@@ -108,7 +108,7 @@
     # Root partition is the third partition of the install device
     root_partition: "{{ install_device }}3"
     # Bootleader var to lower case, just to be sure
-    bootloader: "{{ bootlader|lower }}"
+    bootloader: "{{ bootloader|lower }}"
     # Whether hpet is available
     hpet_available: "{{ hpet_check.changed }}"
   tags:
