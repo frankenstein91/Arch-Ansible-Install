@@ -1,5 +1,5 @@
 #==============================================================================
-# System configuration
+# System localization
 #==============================================================================
 
 - name: Set timezone
@@ -34,22 +34,23 @@
     - locales
 
 - name: Set system language
-  lineinfile:
-    path: /mnt/etc/locale.conf
-    state: present
-    regexp: ^.*
-    line: LANG={{ locales[0] }}
+  template:
+    dest: /mnt/etc/locale.conf
+    src: etc/locale.conf
+    mode: 0644
+    group: root
+    owner: root
   tags:
     - arch2disk
     - localization
     - locales
 
-- name: Set keymap
-  lineinfile:
-    path: /mnt/etc/vconsole.conf
-    state: present
-    regexp: ^.*
-    line: "{{ keymap }}"
+  template:
+    dest: /mnt/etc/vconsole.conf
+    src: etc/vconsole.conf
+    mode: 0644
+    group: root
+    owner: root
   when: keymap|default('', true)|length == 0
   tags:
     - arch2disk
