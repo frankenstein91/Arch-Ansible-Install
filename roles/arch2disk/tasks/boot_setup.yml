@@ -5,7 +5,7 @@
 
 # Install intel microcode if CPU vendor is Intel
 - name: Add intel-ucode if needed
-  command: arch-chroot /mnt pacman -S intel-ucode
+  command: arch-chroot /mnt pacman -S intel-ucode --noconfirm
   when: '"Intel" in cpu_vendor'
   tags:
     - arch2disk
