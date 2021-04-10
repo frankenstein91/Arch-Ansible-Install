@@ -51,7 +51,14 @@
     - mirrors
 
 - name: Install base system to new root
-  command: pacstrap /mnt base base-devel efibootmgr efitools linux linux-firmware openssh python sudo dosfstools btrfs-progs wget git
+  command: >
+    pacstrap /mnt base
+    base-devel wget git
+    efibootmgr efitools
+    linux linux-firmwaresudo
+    openssh networkmanager
+    python
+    dosfstools btrfs-progs
   tags:
     - arch2disk
     - pacstrap
@@ -70,6 +77,12 @@
   tags:
     - arch2disk
     - localization
+
+- name: Networking
+  include_tasks: networking.yml
+  tags:
+    - arch2disk
+    - networking
 
 # TODO install other packages as needed
 # Network manager

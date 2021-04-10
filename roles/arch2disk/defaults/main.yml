@@ -31,3 +31,7 @@ locales:
 # The keymap to set for the system
 # Tries to take the host keymap in case this variable is empty
 keymap:
+
+# Networking ==================================================================
+# Hostname; leave empty to derive it from a hashsum of MAC addresses
+hostname:

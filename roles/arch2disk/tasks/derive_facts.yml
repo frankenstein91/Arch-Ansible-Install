@@ -66,10 +66,28 @@
 - name: Store found host keymap
   set_fact:
     keymap: "{{ localectl_status.stdout | regex_search('Keymap:\\s*(.*)$', '\\1', multiline=True) }}"
-  when: (keymap|default('', true)|length == 0) and (localectl_status.rc == 0)
+  when: (keymap | default('', true) | length == 0) and (localectl_status.rc == 0)
   tags:
     - arch2disk
     - keymap
+
+- name: Generate default hostname if not set
+  shell: cat /sys/class/net/*/address | sha512sum | head -c 10
+  when: hostname | default('', true) | length == 0
+  register: default_hostname
+  tags:
+    - arch2disk
+    - networking
+    - hostname
+
+- name: Ensure a hostname is defined
+  set_fact:
+    hostname: "{{ default_hostname.stdout | trim }}"
+  when: hostname | default('', true) | length == 0
+  tags:
+    - arch2disk
+    - networking
+    - hostname
 
 - name: Set some facts
   set_fact:
