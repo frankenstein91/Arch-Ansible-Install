@@ -1,3 +1,7 @@
+#==============================================================================
+# Main task file
+#==============================================================================
+
 # This task should warrant idempotency, which is always assumed by Ansible
 - name: Abort if the host is not booted from the Arch install media
   fail:
@@ -5,16 +9,14 @@
   when: ansible_nodename != 'archiso'
   tags:
     - arch2disk
+    - boot_check
     - quick_exit
 
-# TODO Check UEFI/BIOS boot...
-# - Differentiate between these two
-# - Set as a fact what the system is booted with
-# - Allow only one by variable, or both by default)
-# - Adjust partitioning and boot loader installation
-#    - Currently only efi implementation
-#    - BIOS: https://gist.github.com/TimL20/38d323853e2b72ae5d9a3537bb841be4
-# Maybe put that in an separate task file with the media boot check (?)
+# This sets some derive facts from ansible_facts and role variables
+- name: Set derived facts
+  include_tasks: derive_facts.yml
+  tags:
+    - arch2disk
 
 - name: Synchronize clock via NTP
   command: timedatectl set-ntp true
@@ -35,22 +37,44 @@
   tags:
     - arch2disk
 
+# Would be nice to have a script doing this without a country code
+# AUR pkg rate-arch-mirrors takes too long to compile+install...
 - name: Use rankmirrors to filter the fastest mirrors that support HTTPS
   shell: >
     curl -s "https://archlinux.org/mirrorlist/?protocol=https&use_mirror_status=on&country={{ locale_country|upper }}"
     | sed -e 's/^#Server/Server/' -e '/^#/d'
     | rankmirrors -n 5 -
     > /etc/pacman.d/mirrorlist
-  warn: false  # ?
+  args:
+    warn: false
   tags:
     - arch2disk
     - mirrors
 
 - name: Install base system to new root
-  command: pacstrap /mnt base base-devel efibootmgr efitools linux linux-firmware openssh python sudo dosfstools btrfs-progs wget git
+  # Install with pacstrap
+  # yes "" | == always pressing the enter key whenever a question is asked
+  # That way always the defaults are chosen
+  command: >
+    pacstrap /mnt base
+    wget git
+    efibootmgr efitools
+    linux linux-firmware sudo
+    openssh networkmanager
+    python
+    dosfstools btrfs-progs
+    --noprogressbar
   tags:
     - arch2disk
     - pacstrap
+
+- name: Install base development tools
+  # pacstrap doesn't like groups
+  shell: arch-chroot /mnt bash -c "yes '' | pacman -S base-devel --noconfirm"
+  tags:
+    - arch2disk
+    - pacstrap
+    - base_devel
 
 # I now about the Ansible module to do this
 # But that would need about a thousands lines more, and is more error-prone
@@ -61,20 +85,27 @@
     - arch2disk
     - fstab
 
-# TODO: further filesystem things
+- name: System localization
+  include_tasks: localization.yml
+  tags:
+    - arch2disk
+    - localization
 
-# TODO chroot for the following steps
+- name: Networking
+  include_tasks: networking.yml
+  tags:
+    - arch2disk
+    - networking
 
-# TODO install other packages as needed
-# Network manager
-# intel-ucode (?)
+- name: Boot setup
+  include_tasks: boot_setup.yml
+  tags:
+    - arch2disk
+    - boot_setup
 
-# TODO: timezone, locals, ...
+# TODO set root passwd
 
-# TODO: add initial user with posible SSH key login + sudo, root passwd
+# TODO: possibly add initial user with posible SSH key login + sudo, root passwd
 
-# TODO: setup network + sshd
-
-# TODO: initramfs
-
-# TODO: UEFI/bootloader
+# TODO "post" installation steps
+#   = all other things to complete installation

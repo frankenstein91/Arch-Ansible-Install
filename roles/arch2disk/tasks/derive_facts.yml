@@ -1,0 +1,178 @@
+#==============================================================================
+# Check variables and set some derived facts
+#
+# This is in this separate task file (that is run first) to have these derived
+# facts accessible everywhere else. For the same reason, these tasks mostly do
+# not have separate tags. The only exception are tasks with a "quick_exit" tag,
+# so that you can skip these in case you know better than these checks.
+# The facts set in these tasks are derived from ansible facts or the variables
+# set for this roles (see defaults for possible variables).
+# Tasks in this taskfile may fail if the set variables for this role have
+# invalid/illegal values.
+#==============================================================================
+
+# Verify UEFI boot
+- name: Find out boot mode
+  stat:
+    path: /sys/firmware/efi/efivars
+  register: efivars_stat
+
+# BIOS boot would require different partitioning
+# Currently only UEFI and only without secure boot supported
+# Though it seems easy to add secure boot support with systemd-boot
+- name: Verify UEFI boot mode
+  fail:
+    msg: System is required to boot with efi
+  when: efivars_stat.stat.exists == False
+  tags:
+    - arch2disk
+    - efi_vars_check
+    - quick_exit
+
+# TODO Check install_device var
+#  -> ansible_facts.devices lists all devices...
+# TODO automatically choose the largest if none is specified
+
+- name: Check for hpet
+  check_mode: yes
+  replace:
+    path: /sys/devices/system/clocksource/clocksource0/available_clocksource
+    regexp: \shpet\s
+    # Act like replacing this to query "changed" result
+    replace: x
+  register: hpet_check
+  tags:
+    - arch2disk
+
+# Timezone ....................................................................
+
+- name: Get local timezone if timezone var is not set
+  stat:
+    path: /etc/localtime
+  when: timezone|default('', true)|length == 0
+  delegate_to: localhost
+  register: local_timezone
+  tags:
+    - arch2disk
+    - set_time
+    - localization
+
+- name: Set local timezone as target timezone
+  set_fact:
+    # Get timezone, e.g. Europe/Berlin (last two / parts)
+    timezone: "{{ local_timezone.stat.lnk_source.split('/')[-2:]|join('/') }}"
+  when: timezone|default('', true)|length == 0
+  tags:
+    - arch2disk
+    - set_time
+    - localization
+
+# Keymap ......................................................................
+
+- name: Try to find out host keymap
+  command: localectl status
+  delegate_to: localhost
+  failed_when: false
+  changed_when: false
+  when: keymap|default('', true)|length == 0
+  register: localectl_status
+  tags:
+    - arch2disk
+    - keymap
+
+- name: Store found host keymap
+  set_fact:
+    keymap: "{{ localectl_status.stdout | regex_search('Keymap:\\s*(.*)$', '\\1', multiline=True) }}"
+  when: (keymap | default('', true) | length == 0) and (localectl_status.rc == 0)
+  tags:
+    - arch2disk
+    - keymap
+
+# Empty keymap = no vconsole = mkinitcpio error
+- name: Check keymap
+  fail:
+    msg: Keymap setting required
+  when: keymap|default('', true)|length == 0
+  tags:
+    - arch2disk
+    - keymap
+    - quick_exit
+
+# Hostname ....................................................................
+
+- name: Generate default hostname if not set
+  shell: cat /sys/class/net/*/address | sha512sum | head -c 10
+  when: hostname | default('', true) | length == 0
+  register: default_hostname
+  tags:
+    - arch2disk
+    - networking
+    - hostname
+
+- name: Ensure a hostname is defined
+  set_fact:
+    hostname: "{{ default_hostname.stdout | trim }}"
+  when: hostname | default('', true) | length == 0
+  tags:
+    - arch2disk
+    - networking
+    - hostname
+
+# Various .....................................................................
+- name: Set some facts
+  set_fact:
+    # Find out CPU vendor for microcode
+    cpu_vendor: "{{ ansible_facts['processor'] | select('match','^(?!\\d).*') | first }}"
+    # Root partition is the third partition of the install device
+    root_partition: "{{ install_device }}3"
+    # Bootleader var to lower case, just to be sure
+    bootloader: "{{ bootloader|lower }}"
+    # Whether hpet is available
+    hpet_available: "{{ hpet_check.changed }}"
+  tags:
+    - arch2disk
+
+# Bootloader ..................................................................
+- name: Check bootloader var
+  fail:
+    msg: The specified bootloader is not supported by this role
+  vars:
+    supported:  # List of possible bootloader var values
+      - systemd-boot
+      # - efistub  # Planned to be supported in the future
+      # - grub  # Planned to be supported in the future
+  when: bootloader not in supported
+
+# Partition sizes .............................................................
+# This task is needed to avoid problems
+- name: Check swap size
+  set_fact:
+    swap_size: 0
+  when: swap_size|int<0
+  tags:
+    - arch2disk
+
+- name: Check efi size
+  fail:
+    msg: EFI partition too small
+  when: efi_size|int<60
+  tags:
+    - arch2disk
+    # There are ways to use less space
+    # So skip this if you know what you're doing
+    - efi_size_check
+    - quick_exit
+
+# Debug the facts that are set above...........................................
+- name: Debug facts
+  debug:
+    msg: |
+      Printing derived facts
+      cpu_vendor: {{ cpu_vendor }}
+      root_partition: {{ root_partition }}
+      swap_size: {{ swap_size }}
+  tags:
+    # Do not run by default
+    - never
+    # But do run if requested with the debug tag
+    - debug

@@ -2,28 +2,6 @@
 # Create partitions and set up filesystem
 #==============================================================================
 
-# TODO Check install device
-#  -> ansible_facts.devices lists all devices...
-
-# Set some default facts to avoid code replication (default filter)
-# TODO maybe move these up???
-- name: Set partitioning fact defaults
-  set_fact:
-    root_partition: "{{ install_device }}3"
-  tags:
-    - arch2disk
-    - partitioning
-
-# This task is here to avoid problems
-- name: Check swap size
-  set_fact:
-    swap_size: 0
-  when: swap_size|int<0
-  tags:
-    - arch2disk
-    - partitioning
-    - quick_exit
-
 - name: Create Swap partition
   parted:
     device: "{{ install_device }}"
@@ -43,6 +21,7 @@
     device: "{{ install_device }}"
     label: gpt
     state: present
+    # Partition numbering will start with 2 if swap is skipped
     number: 2
     name: EFI System Partition
     fs_type: fat32
@@ -76,6 +55,7 @@
     dev: "{{ install_device }}1"
     fstype: swap
     force: yes
+    opts: -L ArchSwap
   tags:
     - arch2disk
     - partitioning
@@ -95,12 +75,14 @@
     dev: "{{ root_partition }}"
     fstype: btrfs
     force: yes
+    opts: -L ArchRoot
   tags:
   - arch2disk
   - partitioning
 
 # Create BTRFS subvolumes .....................................................
 # As far as I can see, there is no Ansible module achieving any of this...
+# TODO this task may not respect idempotency
 - name: Create subvolumes
   shell: |
       mount -t btrfs {{ root_partition }} /mnt
