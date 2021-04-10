@@ -55,18 +55,26 @@
   # Install with pacstrap
   # yes "" | == always pressing the enter key whenever a question is asked
   # That way always the defaults are chosen
-  shell: >
-    yes "" |
+  command: >
     pacstrap /mnt base
-    base-devel wget git
+    wget git
     efibootmgr efitools
     linux linux-firmwaresudo
     openssh networkmanager
     python
     dosfstools btrfs-progs
+    --noprogressbar
   tags:
     - arch2disk
     - pacstrap
+
+- name: Install base development tools
+  # pacstrap doesn't like groups
+  shell: arch-chroot /mnt bash -c "yes '' | pacman -S base-devel --noconfirm"
+  tags:
+    - arch2disk
+    - pacstrap
+    - base_devel
 
 # I now about the Ansible module to do this
 # But that would need about a thousands lines more, and is more error-prone
