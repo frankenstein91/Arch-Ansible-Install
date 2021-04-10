@@ -52,7 +52,11 @@
     - mirrors
 
 - name: Install base system to new root
-  command: >
+  # Install with pacstrap
+  # yes "" | == always pressing the enter key whenever a question is asked
+  # That way always the defaults are chosen
+  shell: >
+    yes "" |
     pacstrap /mnt base
     base-devel wget git
     efibootmgr efitools
