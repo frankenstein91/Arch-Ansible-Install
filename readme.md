@@ -1,4 +1,4 @@
-On Hostsystem:
+﻿On Hostsystem:
 
 1. https://wiki.archlinux.org/index.php/archiso#Prepare_an_ISO_for_an_installation_via_SSH
 
@@ -13,3 +13,5 @@ On Hostsystem:
 6. Boot archiso on target system
 
 7. ansible-playbook -i inventory.yml playbook.yml
+
+It clould be that LFS does not work because of github.com quota. If this should be, please provide your own wallpaper
