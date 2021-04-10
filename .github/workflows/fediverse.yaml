@@ -1,5 +1,8 @@
 name: fediverse-action
-on: [push]
+on:
+  push:
+    branches:
+    - master
 jobs:
   post:
     runs-on: ubuntu-latest
