@@ -1,0 +1,57 @@
+#==============================================================================
+# System configuration
+#==============================================================================
+
+- name: Set timezone
+  command: arch-chroot /mnt ln -sf /usr/share/zoneinfo/{{ timezone }} /etc/localtime
+  tags:
+    - arch2disk
+    - localization
+    - set_time
+
+- name: Set hardware clock
+  command: arch-chroot /mnt hwclock --systohc
+  tags:
+    - arch2disk
+    - localization
+    - set_time
+
+- name: Generate locales, step 1/2
+  replace:
+    path: /mnt/etc/locale.gen
+    regexp: ^\s*#\s*({{ locales|join('|') }})(.*)$
+    replace: \1\2
+  tags:
+    - arch2disk
+    - localization
+    - locales
+
+- name: Generate locales, step 2/2
+  command: arch-chroot /mnt locale-gen
+  tags:
+    - arch2disk
+    - localization
+    - locales
+
+- name: Set system language
+  lineinfile:
+    path: /mnt/etc/locale.conf
+    state: present
+    regexp: ^.*
+    line: LANG={{ locales[0] }}
+  tags:
+    - arch2disk
+    - localization
+    - locales
+
+- name: Set keymap
+  lineinfile:
+    path: /mnt/etc/vconsole.conf
+    state: present
+    regexp: ^.*
+    line: "{{ keymap }}"
+  when: keymap|default('', true)|length == 0
+  tags:
+    - arch2disk
+    - localization
+    - keymap

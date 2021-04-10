@@ -65,11 +65,11 @@
     - arch2disk
     - fstab
 
-# TODO: further filesystem things
-
-# TODO chroot for the following steps
-
-# TODO: timezone, locals, ...
+- name: System localization
+  include_tasks: localization.yml
+  tags:
+    - arch2disk
+    - localization
 
 # TODO install other packages as needed
 # Network manager

@@ -19,3 +19,15 @@ btrfs_compression_level: 6
 # Your country, identified by the internet TLD
 # Used to find fast mirrors
 locale_country: de
+# Local timezone as in /usr/share/zoneinfo/
+# Leave empty to use the timezone of the controller
+timezone:
+# Locales
+# First locale is set as the system language
+# The first an entry of the first column in /etc/locale.gen
+locales:
+  - de_DE.UTF-8
+  - en_US
+# The keymap to set for the system
+# Tries to take the host keymap in case this variable is empty
+keymap:

@@ -31,6 +31,46 @@
 #  -> ansible_facts.devices lists all devices...
 # TODO automatically choose the largest if none is specified
 
+
+- name: Get local timezone if timezone var is not set
+  stat:
+    path: /etc/localtime
+  when: timezone|default('', true)|length == 0
+  delegate_to: localhost
+  register: local_timezone
+  tags:
+    - arch2disk
+    - set_time
+    - localization
+
+- name: Set local timezone as target timezone
+  set_fact:
+    # Get timezone, e.g. Europe/Berlin (last two / parts)
+    timezone: "{{ local_timezone.stat.lnk_source.split('/')[-2:]|join('/') }}"
+  when: timezone|default('', true)|length == 0
+  tags:
+    - arch2disk
+    - set_time
+    - localization
+
+- name: Try to find out host keymap
+  command: localectl status
+  failed_when: false
+  changed_when: false
+  when: keymap|default('', true)|length == 0
+  register: localectl_status
+  tags:
+    - arch2disk
+    - keymap
+
+- name: Store found host keymap
+  set_fact:
+    keymap: "{{ localectl_status.stdout | regex_search('Keymap:\\s*(.*)$', '\\1', multiline=True) }}"
+  when: (keymap|default('', true)|length == 0) and (localectl_status.rc == 0)
+  tags:
+    - arch2disk
+    - keymap
+
 - name: Set some facts
   set_fact:
     # Find out CPU vendor for microcode
