@@ -60,15 +60,4 @@
     - boot_setup
     - systemd_boot
 
-# Update systemd-boot on system update
-- name: Add pacman hook to automatically update systemd-boot on systemd update
-  template:
-    dest: /mnt/etc/pacman.d/hooks/100-systemd-boot.hook
-    src: bootloader/systemd-boot/pacman-update.hook
-    mode: 0644
-    group: root
-    owner: root
-  tags:
-    - arch2disk
-    - boot_setup
-    - systemd_boot
+# TODO add the AUR package that includes the bootctl update pacman hook
