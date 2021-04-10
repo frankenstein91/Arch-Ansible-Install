@@ -28,10 +28,7 @@
 
 # Enable NetworkManager
 - name: Enable NetworkManager
-  systemd:
-    name: NetworkManager.service
-    enabled: yes
-    masked: no
+  command: arch-chroot /mnt systemctl enable NetworkManager.service
   tags:
     - arch2disk
     - networking

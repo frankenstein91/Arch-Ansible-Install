@@ -45,7 +45,8 @@
     | sed -e 's/^#Server/Server/' -e '/^#/d'
     | rankmirrors -n 5 -
     > /etc/pacman.d/mirrorlist
-  warn: false  # ?
+  args:
+    warn: false
   tags:
     - arch2disk
     - mirrors
