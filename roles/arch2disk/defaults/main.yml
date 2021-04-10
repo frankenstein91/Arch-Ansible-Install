@@ -1,10 +1,14 @@
 # GENERAL =====================================================================
 # Where to install ArchLinux to (block device, e.g. /dev/sda)
 install_device: /dev/sda
+# Choose a bootloeader, currently only one supported:
+# efistub (let efi boot the kernel directly)
+bootloader: efistub
 
 # PARTITIONS AND FILESYSTEM ===================================================
 # Swap partition size in MiB
 # Set to 0 to disable swap
+# By default this takes the RAM size
 swap_size: "{{ ansible_facts['memtotal_mb'] }}"
 # EFI partition size in Mib
 efi_size: 1000
@@ -12,5 +16,6 @@ efi_size: 1000
 btrfs_compression_level: 6
 
 # Localization ================================================================
-# Code of your country, e.g. "de" or "fr"
+# Your country, identified by the internet TLD
+# Used to find fast mirrors
 locale_country: de

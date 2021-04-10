@@ -1,3 +1,7 @@
+#==============================================================================
+# Main task file
+#==============================================================================
+
 # This task should warrant idempotency, which is always assumed by Ansible
 - name: Abort if the host is not booted from the Arch install media
   fail:
@@ -5,16 +9,14 @@
   when: ansible_nodename != 'archiso'
   tags:
     - arch2disk
+    - boot_check
     - quick_exit
 
-# TODO Check UEFI/BIOS boot...
-# - Differentiate between these two
-# - Set as a fact what the system is booted with
-# - Allow only one by variable, or both by default)
-# - Adjust partitioning and boot loader installation
-#    - Currently only efi implementation
-#    - BIOS: https://gist.github.com/TimL20/38d323853e2b72ae5d9a3537bb841be4
-# Maybe put that in an separate task file with the media boot check (?)
+# This sets some derive facts from ansible_facts and role variables
+- name: Set derived facts
+  include_tasks: derive_facts.yml
+  tags:
+    - arch2disk
 
 - name: Synchronize clock via NTP
   command: timedatectl set-ntp true
@@ -35,6 +37,8 @@
   tags:
     - arch2disk
 
+# Would be nice to have a script doing this without a country code
+# AUR pkg rate-arch-mirrors takes too long to compile+install...
 - name: Use rankmirrors to filter the fastest mirrors that support HTTPS
   shell: >
     curl -s "https://archlinux.org/mirrorlist/?protocol=https&use_mirror_status=on&country={{ locale_country|upper }}"
@@ -65,11 +69,11 @@
 
 # TODO chroot for the following steps
 
+# TODO: timezone, locals, ...
+
 # TODO install other packages as needed
 # Network manager
 # intel-ucode (?)
-
-# TODO: timezone, locals, ...
 
 # TODO: add initial user with posible SSH key login + sudo, root passwd
 
