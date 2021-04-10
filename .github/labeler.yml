@@ -1,0 +1,11 @@
+# Add 'repo' label to any root file changes
+repo:
+  - ./*
+defaults:
+  - roles/arch2disk/defaults/**/*
+handlers:
+  - roles/arch2disk/handlers/**/*
+tasks:
+  - roles/arch2disk/tasks/**/*
+GitHub:
+  - .github/**/*
