@@ -1,0 +1,74 @@
+#==============================================================================
+# Systemd-boot installation and configuration
+#==============================================================================
+
+- name: Install systemd-boot
+  command: arch-chroot /mnt bootctl install
+  tags:
+    - arch2disk
+    - boot_setup
+    - systemd_boot
+
+# We let sytemd-boot load the linux kernel from the efi partition
+# That way we avoid lots of problems
+
+- name: Create loader dir
+  file:
+    path: /mnt/boot/loader
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  tags:
+    - arch2disk
+    - boot_setup
+    - systemd_boot
+
+- name: Copy loader configuration
+  template:
+    dest: /mnt/boot/loader/loader.conf
+    src: bootloader/systemd-boot/loader.conf
+    mode: 0644
+    group: root
+    owner: root
+  tags:
+    - arch2disk
+    - boot_setup
+    - systemd_boot
+
+- name: Create entries dir
+  file:
+    path: /mnt/boot/loader/entries
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  tags:
+    - arch2disk
+    - boot_setup
+    - systemd_boot
+
+- name: Copy ArchLinux boot entry
+  template:
+    dest: /mnt/boot/loader/entries/arch.conf
+    src: bootloader/systemd-boot/arch.conf
+    mode: 0644
+    group: root
+    owner: root
+  tags:
+    - arch2disk
+    - boot_setup
+    - systemd_boot
+
+# Update systemd-boot on system update
+- name: Add pacman hook to automatically update systemd-boot on systemd update
+  template:
+    dest: /mnt/etc/pacman.d/hooks/100-systemd-boot.hook
+    src: bootloader/systemd-boot/pacman-update.hook
+    mode: 0644
+    group: root
+    owner: root
+  tags:
+    - arch2disk
+    - boot_setup
+    - systemd_boot

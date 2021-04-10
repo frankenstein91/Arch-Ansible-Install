@@ -84,14 +84,15 @@
     - arch2disk
     - networking
 
-# TODO install other packages as needed
-# Network manager
-# intel-ucode (?)
+- name: Boot setup
+  include_tasks: boot_setup.yml
+  tags:
+    - arch2disk
+    - boot_setup
 
-# TODO: add initial user with posible SSH key login + sudo, root passwd
+# TODO set root passwd
 
-# TODO: setup network + sshd
+# TODO: possibly add initial user with posible SSH key login + sudo, root passwd
 
-# TODO: initramfs
-
-# TODO: UEFI/bootloader
+# TODO "post" installation steps
+#   = all other things to complete installation

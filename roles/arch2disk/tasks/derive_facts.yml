@@ -18,6 +18,8 @@
   register: efivars_stat
 
 # BIOS boot would require different partitioning
+# Currently only UEFI and only without secure boot supported
+# Though it seems easy to add secure boot support with systemd-boot
 - name: Verify UEFI boot mode
   fail:
     msg: System is required to boot with efi
@@ -31,6 +33,16 @@
 #  -> ansible_facts.devices lists all devices...
 # TODO automatically choose the largest if none is specified
 
+- name: Check for hpet
+  check_mode: yes
+  replace:
+    path: /sys/devices/system/clocksource/clocksource0/available_clocksource
+    regexp: \shpet\s
+    # Act like replacing this to query "changed" result
+    replace: x
+  register: hpet_check
+  tags:
+    - arch2disk
 
 - name: Get local timezone if timezone var is not set
   stat:
@@ -97,6 +109,8 @@
     root_partition: "{{ install_device }}3"
     # Bootleader var to lower case, just to be sure
     bootloader: "{{ bootlader|lower }}"
+    # Whether hpet is available
+    hpet_available: "{{ hpet_check.changed }}"
   tags:
     - arch2disk
 
@@ -105,7 +119,8 @@
     msg: The specified bootloader is not supported by this role
   vars:
     supported:  # List of possible bootloader var values
-      - efistub
+      - systemd-boot
+      # - efistub  # Planned to be supported in the future
       # - grub  # Planned to be supported in the future
   when: bootloader not in supported
 

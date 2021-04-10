@@ -1,9 +1,9 @@
 # GENERAL =====================================================================
 # Where to install ArchLinux to (block device, e.g. /dev/sda)
 install_device: /dev/sda
-# Choose a bootloeader, currently only one supported:
-# efistub (let efi boot the kernel directly)
-bootloader: efistub
+# Choose a bootloader, currently only one supported:
+# systemd-boot
+bootloader: systemd-boot
 
 # PARTITIONS AND FILESYSTEM ===================================================
 # Swap partition size in MiB

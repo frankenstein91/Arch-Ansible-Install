@@ -55,6 +55,7 @@
     dev: "{{ install_device }}1"
     fstype: swap
     force: yes
+    opts: -L ArchSwap
   tags:
     - arch2disk
     - partitioning
@@ -74,6 +75,7 @@
     dev: "{{ root_partition }}"
     fstype: btrfs
     force: yes
+    opts: -L ArchRoot
   tags:
   - arch2disk
   - partitioning

@@ -1,0 +1,56 @@
+#==============================================================================
+# Boot setup
+# Bootloader etc.
+#==============================================================================
+
+# Install intel microcode if CPU vendor is Intel
+- name: Add intel-ucode if needed
+  command: arch-chroot /mnt pacman -S intel-ucode
+  when: "Intel" in cpu_vendor
+  tags:
+    - arch2disk
+    - boot_setup
+
+- name: Adjust mkinitcpio hooks
+  lineinfile:
+    dest: /mnt/etc/mkinitcpio.conf
+    regexp: ^HOOKS
+    line: HOOKS=(base systemd autodetect modconf block filesystems keyboard sd-vconsole btrfs)
+  tags:
+    - arch2disk
+    - boot_setup
+    - initramfs
+
+- name: Re-generate initframfs
+  command: arch-chroot /mnt mkinitcpio -p linux
+  tags:
+    - arch2disk
+    - boot_setup
+    - initramfs
+
+- name: Install and configure bootloader
+  include_tasks: bootloader/{{ bootloader }}.yml
+  tags:
+    - arch2disk
+    - boot_setup
+
+
+
+
+# Just as a note...
+# - name: Add efistub entry
+#   command: >
+#     efibootmgr --create
+#     --label "ArchLinux"
+#     --disk {{ install_device }} --part 1
+#     --loader /vmlinuz-linux --unicode
+#     'root=PARTUUID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+#     rw rootflags=subvol=root
+#     resume=PARTUUID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+#     initrd=\initramfs-linux.img
+#     quiet'
+#   when:
+#   tags:
+#     - arch2disk
+#     - boot_setup
+#     - initramfs
