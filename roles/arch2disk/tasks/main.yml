@@ -59,7 +59,7 @@
     pacstrap /mnt base
     wget git
     efibootmgr efitools
-    linux linux-firmwaresudo
+    linux linux-firmware sudo
     openssh networkmanager
     python
     dosfstools btrfs-progs
