@@ -1,0 +1,25 @@
+#==============================================================================
+# Users
+# Set root passwd
+# Add initial user
+#==============================================================================
+
+- name: Create random root password
+  set_fact:
+    rootpasswd: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') }}"
+  when: rootpasswd | default('', true) | length == 0
+  tags:
+    - arch2disk
+    - user_setup
+    - root_passwd
+
+- name: Set root password
+  user:
+    name: root
+    password: "{{ rootpasswd | password_hash('sha512') }}"
+  tags:
+    - arch2disk
+    - user_setup
+    - root_passwd
+
+# TODO add initial user, allow him to sudo and SSH logon with key

@@ -15,7 +15,7 @@ efi_size: 1000
 # Btrfs: transparent zstd compression level (integer, 1-9)
 btrfs_compression_level: 6
 
-# Localization ================================================================
+# LOCALIZATION ================================================================
 # Your country, identified by the internet TLD
 # Used to find fast mirrors
 locale_country: de
@@ -32,6 +32,10 @@ locales:
 # Tries to take the host keymap in case this variable is empty
 keymap:
 
-# Networking ==================================================================
+# NETWORKING ==================================================================
 # Hostname; leave empty to derive it from a hashsum of MAC addresses
 hostname:
+
+# USERS =======================================================================
+# Root password - leave empty to set a random password
+rootpasswd:
