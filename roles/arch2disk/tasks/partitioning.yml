@@ -125,3 +125,9 @@
   tags:
     - arch2disk
     - partitioning
+
+- name: Add kernel parameters for partitions
+  set_fact:
+    kernel_parameters: "{{ kernel_parameters + ['root=\"LABEL=ArchRoot\" rootflags=subvol=root resume=\"LABEL=ArchSwap\"'] }}"
+  tags:
+    - arch2disk

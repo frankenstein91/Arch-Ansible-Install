@@ -16,6 +16,8 @@
   stat:
     path: /sys/firmware/efi/efivars
   register: efivars_stat
+  tags:
+    - arch2disk
 
 # BIOS boot would require different partitioning
 # Currently only UEFI and only without secure boot supported
@@ -32,17 +34,6 @@
 # TODO Check install_device var
 #  -> ansible_facts.devices lists all devices...
 # TODO automatically choose the largest if none is specified
-
-- name: Check for hpet
-  check_mode: yes
-  replace:
-    path: /sys/devices/system/clocksource/clocksource0/available_clocksource
-    regexp: \shpet\s
-    # Act like replacing this to query "changed" result
-    replace: x
-  register: hpet_check
-  tags:
-    - arch2disk
 
 # Timezone ....................................................................
 
@@ -127,8 +118,8 @@
     root_partition: "{{ install_device }}3"
     # Bootleader var to lower case, just to be sure
     bootloader: "{{ bootloader|lower }}"
-    # Whether hpet is available
-    hpet_available: "{{ hpet_check.changed }}"
+    # Default list of kernel parameters
+    kernel_parameters: "{{ ['rw'] }}"
   tags:
     - arch2disk
 
@@ -163,6 +154,28 @@
     - efi_size_check
     - quick_exit
 
+# Add kernel parameters =======================================================
+
+# HPET ........................................................................
+- name: Check for hpet
+  check_mode: yes  # = don't actually do anything
+  replace:
+    path: /sys/devices/system/clocksource/clocksource0/available_clocksource
+    regexp: \shpet\s
+    # Act like replacing "hpet", to possibly get a "changed" result
+    replace: x
+  register: hpet_check
+  tags:
+    - arch2disk
+    - hpet
+
+- name: Add hpet to kernel parameter
+  set_fact:
+    kernel_parameters: "{{ kernel_parameters + ['clocksource=hpet'] }}"
+  tags:
+    - arch2disk
+    - hpet
+
 # Debug the facts that are set above...........................................
 - name: Debug facts
   debug:
@@ -171,6 +184,7 @@
       cpu_vendor: {{ cpu_vendor }}
       root_partition: {{ root_partition }}
       swap_size: {{ swap_size }}
+      kernel_parameters: {{ kernel_parameters }}
   tags:
     # Do not run by default
     - never
