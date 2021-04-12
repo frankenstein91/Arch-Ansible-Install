@@ -26,19 +26,19 @@
     - networking
     - hostname
 
-- name: Creating a file with content
+- name: Configure MAC randomizing in NM
+  copy:
+    dest: "/mnt/etc/NetworkManager/conf.d/wifi_rand_mac.conf"
+    content: |
+      [device]
+      wifi.scan-rand-mac-address=yes
+      [connection-mac-randomization]
+      wifi.cloned-mac-address=stable
   tags:
     - arch2disk
     - networking
     - networkmanager
     - WiFi
-    copy:
-      dest: "/mnt/etc/NetworkManager/conf.d/wifi_rand_mac.conf"
-      content: |
-        [device]
-        wifi.scan-rand-mac-address=yes
-        [connection-mac-randomization]
-        wifi.cloned-mac-address=stable
 # Enable NetworkManager
 - name: Enable NetworkManager
   command: arch-chroot /mnt systemctl enable NetworkManager.service
