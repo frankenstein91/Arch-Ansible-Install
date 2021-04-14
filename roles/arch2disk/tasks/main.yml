@@ -61,7 +61,7 @@
     efibootmgr efitools
     linux linux-firmware sudo
     openssh networkmanager
-    python
+    python vi nano
     dosfstools btrfs-progs
     --noprogressbar
   tags:
