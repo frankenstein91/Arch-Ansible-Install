@@ -113,7 +113,7 @@
 # TODO maybe this is doable with ansible facts?
 # What we do here is to query the route to the control machine (ssh client IP)
 - name: Currently used network interface
-  shell: ip route get "{{ lookup('env','SSH_CONNECTION') | regex_search('^([^ ]+)', '\\1') | first }}"
+  shell: "ip route get {{ lookup('env','SSH_CONNECTION') | regex_search('^([^ ]+)', '\\1') | first }}"
   register: network_interface
   tags:
     - arch2disk
