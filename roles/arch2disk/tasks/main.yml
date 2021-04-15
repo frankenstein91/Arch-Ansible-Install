@@ -25,8 +25,10 @@
     apply:
       tags:
         - arch2disk
+        - derive_facts
   tags:
     - arch2disk
+    - derive_facts
 
 - name: Include partitioning tasks
   include_tasks:
