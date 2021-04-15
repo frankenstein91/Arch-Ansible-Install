@@ -40,6 +40,17 @@
   tags:
     - networkmanager
 
+- name: Copy NetworkManager static IP config
+  template:
+    dest: /mnt/etc/NetworkManager/system_connections
+    src: etc/NetworkManager/system_connections
+    mode: 0644
+    group: root
+    owner: root
+  tags:
+    - networkmanager
+    - static_ip
+
 # Enable SSH server
 - name: Enable sshd
   command: arch-chroot /mnt systemctl enable sshd
