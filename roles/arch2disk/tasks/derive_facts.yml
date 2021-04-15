@@ -113,7 +113,7 @@
 # TODO maybe this is doable with ansible facts?
 # What we do here is to query the route to the control machine (ssh client IP)
 - name: Currently used network interface
-  shell: "ip route get {{ lookup('env','SSH_CONNECTION') | regex_search('^([^ ]+)', '\\1') | first }}"
+  shell: "ip route get $(echo $SSH_CONNECTION | cut -d \" \" -f 1)"
   register: network_interface
   tags:
     - arch2disk
@@ -127,7 +127,7 @@
     # IP of the target machine via ssh client variable lookup
     network_target_ip: "{{ lookup('env','SSH_CONNECTION') | regex_search('^([^ ]+ ){2,2}([^ ]+)', '\\2') | first }}"
     # Network interface (currenty that variable holds the route line)
-    network_interface: "{{ network_connection | regex_search('dev ([^ ]+)', '\\1') | first }}"
+    network_interface: "{{ network_interface | regex_search('dev ([^ ]+)', '\\1') | first }}"
     # Root partition is the third partition of the install device
     root_partition: "{{ install_device }}3"
     # Bootleader var to lower case, just to be sure
