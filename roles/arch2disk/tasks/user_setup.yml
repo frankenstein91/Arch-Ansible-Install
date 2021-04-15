@@ -41,4 +41,21 @@
   tags:
     - root_ssh
 
-# TODO add option for initial user, allow him to sudo and SSH logon with key
+- name: Create initial user password if not set
+  set_fact:
+    initial_user_pass: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') }}"
+  when: initial_user_pass | default('', true) | length == 0
+  tags:
+    - initial_user
+
+- name: Create initial user
+  command: arch-chroot /mnt useradd --create-home --user-group --groups wheel {{ initial_user_name }} --password {{ initial_user_pass }}
+  tags:
+    - initial_user
+
+- name: Allow sudo for wheel group
+  copy:
+    content: "%wheel ALL=(ALL) NOPASSWD: ALL"
+    dest: /mnt/etc/sudoers.d/wheel
+  tags:
+    - sudo
