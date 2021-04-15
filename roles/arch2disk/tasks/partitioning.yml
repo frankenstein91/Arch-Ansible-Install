@@ -12,9 +12,6 @@
     fs_type: linux-swap
     part_end: "{{ swap_size }}MiB"
   when: swap_size|int>0  # Only create SWAP when size>0
-  tags:
-    - arch2disk
-    - partitioning
 
 - name: Create EFI partition
   parted:
@@ -29,9 +26,6 @@
     # Start right after swap partition
     part_start: "{{ swap_size }}MiB"
     part_end: "{{ swap_size|int + efi_size|int }}MiB"
-  tags:
-    - arch2disk
-    - partitioning
 
 - name: Create root partition
   parted:
@@ -45,9 +39,6 @@
     part_start: "{{ swap_size|int + efi_size|int }}MiB"
     # Fill the device
     part_end: "100%"
-  tags:
-    - arch2disk
-    - partitioning
 
 # Format ......................................................................
 - name: Format swap partition
@@ -56,9 +47,6 @@
     fstype: swap
     force: yes
     opts: -L ArchSwap
-  tags:
-    - arch2disk
-    - partitioning
 
 - name: Format EFI partition FAT32
   filesystem:
@@ -66,9 +54,6 @@
     fstype: vfat
     opts: -F32
     force: yes
-  tags:
-  - arch2disk
-  - partitioning
 
 - name: Format root partition
   filesystem:
@@ -76,9 +61,6 @@
     fstype: btrfs
     force: yes
     opts: -L ArchRoot
-  tags:
-  - arch2disk
-  - partitioning
 
 # Create BTRFS subvolumes .....................................................
 # As far as I can see, there is no Ansible module achieving any of this...
@@ -93,9 +75,6 @@
       btrfs subvolume create tmp
       cd /
       umount /mnt
-  tags:
-    - arch2disk
-    - partitioning
 
 - name: Mount everything
   shell: >
@@ -115,19 +94,11 @@
 
       mount -o X-mount.mkdir,nodev
       {{ install_device }}2 /mnt/boot
-  tags:
-    - arch2disk
-    - partitioning
 
 - name: Enable swap
   command: swapon {{ install_device }}1
   when: swap_size|int>0
-  tags:
-    - arch2disk
-    - partitioning
 
 - name: Add kernel parameters for partitions
   set_fact:
     kernel_parameters: "{{ kernel_parameters + ['root=\"LABEL=ArchRoot\" rootflags=subvol=root resume=\"LABEL=ArchSwap\"'] }}"
-  tags:
-    - arch2disk

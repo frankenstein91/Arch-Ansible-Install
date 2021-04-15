@@ -4,10 +4,6 @@
 
 - name: Install systemd-boot
   command: arch-chroot /mnt bootctl install
-  tags:
-    - arch2disk
-    - boot_setup
-    - systemd_boot
 
 # We let sytemd-boot load the linux kernel from the efi partition
 # That way we avoid lots of problems
@@ -19,10 +15,6 @@
     mode: 0755
     owner: root
     group: root
-  tags:
-    - arch2disk
-    - boot_setup
-    - systemd_boot
 
 - name: Copy loader configuration
   template:
@@ -31,10 +23,6 @@
     mode: 0644
     group: root
     owner: root
-  tags:
-    - arch2disk
-    - boot_setup
-    - systemd_boot
 
 - name: Create entries dir
   file:
@@ -43,10 +31,6 @@
     mode: 0755
     owner: root
     group: root
-  tags:
-    - arch2disk
-    - boot_setup
-    - systemd_boot
 
 - name: Copy ArchLinux boot entry
   template:
@@ -55,9 +39,5 @@
     mode: 0644
     group: root
     owner: root
-  tags:
-    - arch2disk
-    - boot_setup
-    - systemd_boot
 
 # TODO add the AUR package that includes the bootctl update pacman hook

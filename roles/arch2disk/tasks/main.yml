@@ -20,12 +20,21 @@
 
 # This sets some derive facts from ansible_facts and role variables
 - name: Set derived facts
-  include_tasks: derive_facts.yml
+  include_tasks:
+    file: derive_facts.yml
+    apply:
+      tags:
+        - arch2disk
   tags:
     - arch2disk
 
 - name: Include partitioning tasks
-  include_tasks: partitioning.yml
+  include_tasks:
+    file: partitioning.yml
+    apply:
+      tags:
+        - arch2disk
+        - partitioning
   tags:
     - arch2disk
     - partitioning
@@ -86,32 +95,45 @@
     - fstab
 
 - name: System localization
-  include_tasks: localization.yml
+  include_tasks:
+    file: localization.yml
+    apply:
+      tags:
+        - arch2disk
+        - localization
   tags:
     - arch2disk
     - localization
 
 - name: Networking
-  include_tasks: networking.yml
+  include_tasks:
+    file: networking.yml
+    apply:
+      tags:
+        - arch2disk
+        - networking
   tags:
     - arch2disk
     - networking
-
-- name: Enable sshd
-  command: arch-chroot /mnt systemctl enable sshd
-  tags:
-    - arch2disk
-    - networking
-    - sshd
 
 - name: Initial user setup
-  include_tasks: user_setup.yml
+  include_tasks:
+    file: user_setup.yml
+    apply:
+      tags:
+        - arch2disk
+        - user_setup
   tags:
     - arch2disk
     - user_setup
 
 - name: Boot setup
-  include_tasks: boot_setup.yml
+  include_tasks:
+    file: boot_setup.yml
+    apply:
+      tags:
+        - arch2disk
+        - boot_setup
   tags:
     - arch2disk
     - boot_setup

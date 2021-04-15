@@ -9,8 +9,6 @@
     rootpasswd: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') }}"
   when: rootpasswd | default('', true) | length == 0
   tags:
-    - arch2disk
-    - user_setup
     - root_passwd
 
 - name: Set root password
@@ -18,8 +16,6 @@
     name: root
     password: "{{ rootpasswd | password_hash('sha512') }}"
   tags:
-    - arch2disk
-    - user_setup
     - root_passwd
 
 - name: Create root .ssh dir if needed
@@ -31,8 +27,6 @@
     group: root
   when: root_copy_allowed_keys
   tags:
-    - arch2disk
-    - boot_setup
     - root_ssh
 
 - name: Copy SSH archiso key for root user
@@ -45,8 +39,6 @@
     group: root
   when: root_copy_allowed_keys
   tags:
-    - arch2disk
-    - user_setup
     - root_ssh
 
 # TODO add option for initial user, allow him to sudo and SSH logon with key
