@@ -39,3 +39,5 @@ hostname:
 # USERS =======================================================================
 # Root password - leave empty to set a random password
 rootpasswd:
+# Whether to copy the allowed public keys of the archiso to the new root user
+root_copy_authorized_keys: true

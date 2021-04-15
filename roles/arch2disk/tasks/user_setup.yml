@@ -22,4 +22,31 @@
     - user_setup
     - root_passwd
 
-# TODO add initial user, allow him to sudo and SSH logon with key
+- name: Create root .ssh dir if needed
+  file:
+    path: /mnt/root/.ssh
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  when: root_copy_allowed_keys
+  tags:
+    - arch2disk
+    - boot_setup
+    - root_ssh
+
+- name: Copy SSH archiso key for root user
+  copy:
+    remote_src: true  # Copy from remote machine
+    src: /root/.ssh/authorized_keys
+    dest: /mnt/root/.ssh/authorized_keys
+    mode: 0600
+    owner: root
+    group: root
+  when: root_copy_allowed_keys
+  tags:
+    - arch2disk
+    - user_setup
+    - root_ssh
+
+# TODO add option for initial user, allow him to sudo and SSH logon with key

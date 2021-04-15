@@ -97,11 +97,12 @@
     - arch2disk
     - networking
 
-- name: Boot setup
-  include_tasks: boot_setup.yml
+- name: Enable sshd
+  command: arch-chroot /mnt systemctl enable sshd
   tags:
     - arch2disk
-    - boot_setup
+    - networking
+    - sshd
 
 - name: Initial user setup
   include_tasks: user_setup.yml
@@ -109,6 +110,11 @@
     - arch2disk
     - user_setup
 
+- name: Boot setup
+  include_tasks: boot_setup.yml
+  tags:
+    - arch2disk
+    - boot_setup
 
 # TODO "post" installation steps
 #   = all other things to complete installation
