@@ -42,8 +42,8 @@
 
 - name: Copy NetworkManager static IP config
   template:
-    dest: /mnt/etc/NetworkManager/system_connections
-    src: etc/NetworkManager/system_connections
+    dest: /mnt/etc/NetworkManager/system-connections
+    src: etc/NetworkManager/system-connections
     mode: 0644
     group: root
     owner: root
