@@ -1,5 +1,5 @@
 - name: Install fonts needed
-  command: arch-chroot /mnt pacman -S ttf-joypixels ttf-liberation wqy-zenhei otf-ipafont noto-fonts noto-fonts-emoji --noconfirm
+  command: arch-chroot /mnt pacman -S ttf-joypixels ttf-hannom ttf-liberation wqy-zenhei otf-ipafont noto-fonts noto-fonts-emoji --noconfirm
   tags:
     - arch2disk
     - fonts
