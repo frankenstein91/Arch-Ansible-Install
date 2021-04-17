@@ -9,3 +9,5 @@ tasks:
   - roles/arch2disk/tasks/**/*
 GitHub:
   - .github/**/*
+Documentation:
+  - Documentation/**
