@@ -67,13 +67,13 @@ Diese Schritte werden alle auf dem eigenen ArchLinux-System ausgeführt und (bis
 
 20. die Datei **Arch-Ansible-Install/inventory.yml** in einem Editor der Wahl öffnen
     
-    . diese Datei ist im Yaml-Format, Einrückungen sind <mark>wichtig</mark>
+    * diese Datei ist im Yaml-Format, Einrückungen sind <mark>wichtig</mark>
     
-    . unter dem Ast "hosts:" muss für jedes System ein Eintrag mit eindeutigem Namen erstellt werden. Im Beispiel nutzen wir dafür `archiso`. Dieser Name wird nur in der Config genutzt und hat keine weitere Bedeutung
+    * unter dem Ast "hosts:" muss für jedes System ein Eintrag mit eindeutigem Namen erstellt werden. Im Beispiel nutzen wir dafür `archiso`. Dieser Name wird nur in der Config genutzt und hat keine weitere Bedeutung
     
-    . der `ansible_user` ist immer `root`
+    * der `ansible_user` ist immer `root`
     
-    . die Information `ansible_host` wird jeweils mit der notierten IP gefüllt
+    * die Information `ansible_host` wird jeweils mit der notierten IP gefüllt
 
 21. `cd Arch-Ansible-Install/`
 
