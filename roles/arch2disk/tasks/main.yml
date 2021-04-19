@@ -140,5 +140,9 @@
     - arch2disk
     - boot_setup
 
-# TODO "post" installation steps
-#   = all other things to complete installation
+- name: Reboot the machine
+  reboot:
+  tags:
+    - arch2disk
+    - boot_setup
+    - reboot
