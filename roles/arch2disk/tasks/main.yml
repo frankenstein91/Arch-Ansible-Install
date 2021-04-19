@@ -2,7 +2,7 @@
 # Main task file
 #==============================================================================
 
-# This task should warrant idempotency, which is always assumed by Ansible
+# This tasks helps to warrant idempotency, which is always assumed by Ansible
 - name: Abort if the host is not booted from the Arch install media
   fail:
     msg: "This host is not booted from the Arch install media!"
@@ -12,20 +12,31 @@
     - boot_check
     - quick_exit
 
-# This sets some derive facts from ansible_facts and role variables
-- name: Set derived facts
-  include_tasks: derive_facts.yml
-  tags:
-    - arch2disk
-
 - name: Synchronize clock via NTP
   command: timedatectl set-ntp true
   tags:
     - arch2disk
     - sync_clock
 
+# This sets some derive facts from ansible_facts and role variables
+- name: Set derived facts
+  include_tasks:
+    file: derive_facts.yml
+    apply:
+      tags:
+        - arch2disk
+        - derive_facts
+  tags:
+    - arch2disk
+    - derive_facts
+
 - name: Include partitioning tasks
-  include_tasks: partitioning.yml
+  include_tasks:
+    file: partitioning.yml
+    apply:
+      tags:
+        - arch2disk
+        - partitioning
   tags:
     - arch2disk
     - partitioning
@@ -57,11 +68,11 @@
   # That way always the defaults are chosen
   command: >
     pacstrap /mnt base
-    wget git
+    wget git nano vim
     efibootmgr efitools
     linux linux-firmware sudo
     openssh networkmanager
-    python
+    python pyalpm
     dosfstools btrfs-progs
     --noprogressbar
   tags:
@@ -86,26 +97,69 @@
     - fstab
 
 - name: System localization
-  include_tasks: localization.yml
+  include_tasks:
+    file: localization.yml
+    apply:
+      tags:
+        - arch2disk
+        - localization
   tags:
     - arch2disk
     - localization
 
+- name: Install fonts
+  include_tasks: fonts.yml
+  tags:
+    - arch2disk
+    - fonts
+
+- name: Install pikaur
+  # Install pikaur using pikaur
+  shell: |
+    cd /tmp
+    git clone https://github.com/actionless/pikaur.git
+    cd pikaur
+    python3 ./pikaur.py -S pikaur --noconfirm
+  tags:
+    - arch2disk
+    - pikaur
+
 - name: Networking
-  include_tasks: networking.yml
+  include_tasks:
+    file: networking.yml
+    apply:
+      tags:
+        - arch2disk
+        - networking
   tags:
     - arch2disk
     - networking
 
+- name: Initial user setup
+  include_tasks:
+    file: user_setup.yml
+    apply:
+      tags:
+        - arch2disk
+        - user_setup
+  tags:
+    - arch2disk
+    - user_setup
+
 - name: Boot setup
-  include_tasks: boot_setup.yml
+  include_tasks:
+    file: boot_setup.yml
+    apply:
+      tags:
+        - arch2disk
+        - boot_setup
   tags:
     - arch2disk
     - boot_setup
 
-# TODO set root passwd
-
-# TODO: possibly add initial user with posible SSH key login + sudo, root passwd
-
-# TODO "post" installation steps
-#   = all other things to complete installation
+- name: Reboot the machine
+  reboot:
+  tags:
+    - arch2disk
+    - boot_setup
+    - reboot
