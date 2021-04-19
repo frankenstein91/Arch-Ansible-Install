@@ -19,7 +19,7 @@ Diese Schritte werden alle auf dem eigenen ArchLinux-System ausgeführt und (bis
 4. `mkdir -p archlive/airootfs/etc/systemd/system/multi-user.target.wants`
 
 5. `ln -s /usr/lib/systemd/system/sshd.service archlive/airootfs/etc/systemd/system/multi-user.target.wants/`
-   *bei diesem Befehl kann der Fehler `ln -s /usr/lib/systemd/system/sshd.service archlive/airootfs/etc/systemd/system/multi-user.target.wants/` auftreten, er kann ignoriert werden.*
+   *bei diesem Befehl kann ein Fehler "die Datei gibt es schon" auftreten, er kann ignoriert werden.*
 
 6. `mkdir archlive/airootfs/root/.ssh`
 
@@ -30,18 +30,21 @@ Diese Schritte werden alle auf dem eigenen ArchLinux-System ausgeführt und (bis
 9. öffne die Datei **archlive/profiledef.sh** in einem Editor der Wahl
 
    1. finde in der Datei den Abschnitt "file_permissions". Aktuell müsste er ungefähr so aussehen:
-      `file_permissions=(
+   ```
+      file_permissions=(
         ["/etc/shadow"]="0:0:400"
         ["/root"]="0:0:750"
         ["/root/.automated_script.sh"]="0:0:755"
         ["/usr/local/bin/choose-mirror"]="0:0:755"
         ["/usr/local/bin/Installation_guide"]="0:0:755"
         ["/usr/local/bin/livecd-sound"]="0:0:755"
-      )`
-
+      )
+  ```
    2. füge folgende zusätliche Zeilen in die Liste zwischen den runden Klammern ein
-      `  ["/root/.ssh"]="0:0:0700"
-        ["/root/.ssh/authorized_keys"]="0:0:0600"`
+   ```
+      ["/root/.ssh"]="0:0:0700"
+      ["/root/.ssh/authorized_keys"]="0:0:0600"
+   ```
 
    3. speichere und schließe die Datei
 
@@ -61,11 +64,11 @@ Diese Schritte werden alle auf dem eigenen ArchLinux-System ausgeführt und (bis
 
 17. Nun ist der Schritt gekommen, an dem wir das erstellte ISO auf eine CD brennen oder mit [balenaEtcher](https://www.balena.io/etcher/) auf einen USB-Stick übertragen müssen. *Dieser Schritt muss wiederholt werden, wenn mehrere Systeme parallel installiert werden sollen.*
 
-18. die Systeme von den tragbaren Medien booten, dabei die Booteinstellungen im UEFI auf der Festplatte als erstes Medium belassen
+18. ⚠Auf dem Zielsystem⚠ die Systeme von den tragbaren Medien booten, dabei die Booteinstellungen im UEFI auf der Festplatte als erstes Medium belassen
 
-19. per `ip a s` die IP-Adressen der Systeme bestimmen und am besten notieren
+19. ⚠Auf dem Zielsystem⚠ per `ip a s` die IP-Adressen der Systeme bestimmen und am besten notieren
 
-20. die Datei **Arch-Ansible-Install/inventory.yml** in einem Editor der Wahl öffnen
+20. ⚠wieder am Verteilsystem⚠ die Datei **Arch-Ansible-Install/inventory.yml** in einem Editor der Wahl öffnen
 
     * diese Datei ist im Yaml-Format, Einrückungen sind <mark>wichtig</mark>
 
