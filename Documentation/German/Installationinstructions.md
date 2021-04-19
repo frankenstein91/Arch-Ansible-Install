@@ -39,7 +39,7 @@ Diese Schritte werden alle auf dem eigenen ArchLinux-System ausgeführt und (bis
         ["/usr/local/bin/Installation_guide"]="0:0:755"
         ["/usr/local/bin/livecd-sound"]="0:0:755"
       )
-  ```
+   ```
    2. füge folgende zusätliche Zeilen in die Liste zwischen den runden Klammern ein
    ```
       ["/root/.ssh"]="0:0:0700"
