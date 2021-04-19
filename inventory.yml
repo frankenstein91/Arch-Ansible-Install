@@ -2,3 +2,5 @@ all:
   hosts:
     archiso:
       ansible_user: root
+      # IP of your host to install goes here
+      ansible_host: 10.1.2.3

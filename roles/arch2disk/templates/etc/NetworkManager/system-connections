@@ -1,0 +1,27 @@
+[connection]
+id=Temporory setup network connection
+uuid={{ 99999999 | random | to_uuid }}
+type=ethernet
+autoconnect-priority=0
+interface-name={{ network_interface }}
+metered=2
+permissions=
+timestamp={{ ansible_date_time.epoch }}
+
+[ethernet]
+cloned-mac-address=permanent
+mac-address-blacklist=
+
+{% if ":" in network_target_ip %}
+{% set ipv = "6" %}{% set ipvs = "4" %}
+{% else %}
+{% set ipv = "4" %}{% set ipvs = "5" %}
+{% endif %}
+
+[ipv{{ ipv }}]
+method=manual
+address1={{ network_target_ip }}
+dns=8.8.8.8
+
+[ipv{{ ipvs }}]
+method=ignore

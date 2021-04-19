@@ -1,0 +1,22 @@
+#==============================================================================
+# efistub installation and configuration
+#==============================================================================
+
+- name: Add efistub entry
+  command: >
+    efibootmgr --create
+    --label "ArchLinux"
+    --disk {{ install_device }} --part 1
+    --loader /vmlinuz-linux --unicode
+    'root=PARTUUID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+    rw rootflags=subvol=root
+    resume=PARTUUID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+    initrd=\initramfs-linux.img
+    quiet'
+  when:
+  tags:
+    - arch2disk
+    - boot_setup
+    - initramfs
+
+# TODO make this the default entry...

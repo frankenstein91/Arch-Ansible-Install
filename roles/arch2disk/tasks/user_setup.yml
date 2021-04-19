@@ -1,0 +1,60 @@
+#==============================================================================
+# Users
+# Set root passwd
+# Add initial user
+#==============================================================================
+
+- name: Create random root password
+  set_fact:
+    rootpasswd: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') }}"
+  when: rootpasswd | default('', true) | length == 0
+  tags:
+    - root_passwd
+
+- name: Set root password
+  shell: echo "root:{{ rootpasswd }}" | chpasswd
+  tags:
+    - root_passwd
+
+- name: Create root .ssh dir if needed
+  file:
+    path: /mnt/root/.ssh
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  when: root_copy_authorized_keys
+  tags:
+    - root_ssh
+
+- name: Copy SSH archiso key for root user
+  copy:
+    remote_src: true  # Copy from remote machine
+    src: /root/.ssh/authorized_keys
+    dest: /mnt/root/.ssh/authorized_keys
+    mode: 0600
+    owner: root
+    group: root
+  when: root_copy_authorized_keys
+  tags:
+    - root_ssh
+
+- name: Create initial user password if not set
+  set_fact:
+    initial_user_pass: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') }}"
+  when: initial_user_pass | default('', true) | length == 0
+  tags:
+    - initial_user
+
+- name: Create initial user
+  command: arch-chroot /mnt useradd --create-home --user-group --groups wheel {{ initial_user_name }} --password {{ initial_user_pass }}
+  when: initial_user_pass | default('', true) | length == 0
+  tags:
+    - initial_user
+
+- name: Allow sudo for wheel group
+  copy:
+    content: "%wheel ALL=(ALL) NOPASSWD: ALL"
+    dest: /mnt/etc/sudoers.d/wheel
+  tags:
+    - sudo

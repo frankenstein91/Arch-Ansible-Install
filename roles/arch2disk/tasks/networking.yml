@@ -10,8 +10,6 @@
     group: root
     owner: root
   tags:
-    - arch2disk
-    - networking
     - hostname
 
 - name: Copy /etc/hosts
@@ -22,8 +20,6 @@
     group: root
     owner: root
   tags:
-    - arch2disk
-    - networking
     - hostname
 
 - name: Configure MAC randomizing in NM
@@ -35,14 +31,28 @@
       [connection-mac-randomization]
       wifi.cloned-mac-address=stable
   tags:
-    - arch2disk
-    - networking
     - networkmanager
-    - WiFi
+    - wifi
+
 # Enable NetworkManager
 - name: Enable NetworkManager
   command: arch-chroot /mnt systemctl enable NetworkManager.service
   tags:
-    - arch2disk
-    - networking
     - networkmanager
+
+- name: Copy NetworkManager static IP config
+  template:
+    dest: /mnt/etc/NetworkManager/system-connections
+    src: etc/NetworkManager/system-connections
+    mode: 0644
+    group: root
+    owner: root
+  tags:
+    - networkmanager
+    - static_ip
+
+# Enable SSH server
+- name: Enable sshd
+  command: arch-chroot /mnt systemctl enable sshd
+  tags:
+    - sshd
