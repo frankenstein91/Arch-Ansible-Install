@@ -16,6 +16,8 @@
   stat:
     path: /sys/firmware/efi/efivars
   register: efivars_stat
+  tags:
+    - arch2disk
 
 # BIOS boot would require different partitioning
 # Currently only UEFI and only without secure boot supported
@@ -32,17 +34,6 @@
 # TODO Check install_device var
 #  -> ansible_facts.devices lists all devices...
 # TODO automatically choose the largest if none is specified
-
-- name: Check for hpet
-  check_mode: yes
-  replace:
-    path: /sys/devices/system/clocksource/clocksource0/available_clocksource
-    regexp: \shpet\s
-    # Act like replacing this to query "changed" result
-    replace: x
-  register: hpet_check
-  tags:
-    - arch2disk
 
 # Timezone ....................................................................
 
@@ -118,17 +109,31 @@
     - networking
     - hostname
 
+# Currently used network connection ...........................................
+# TODO maybe this is doable with ansible facts?
+# What we do here is to query the route to the control machine (ssh client IP)
+- name: Currently used network interface
+  shell: "ip route get {{ ansible_env.SSH_CONNECTION | regex_search('^([^ ]+) ', '\\1') | first }}"
+  register: network_interface
+  tags:
+    - arch2disk
+    - networking
+
 # Various .....................................................................
 - name: Set some facts
   set_fact:
     # Find out CPU vendor for microcode
     cpu_vendor: "{{ ansible_facts['processor'] | select('match','^(?!\\d).*') | first }}"
+    # IP of the target machine via ssh client variable lookup
+    network_target_ip: "{{ ansible_env.SSH_CONNECTION | regex_search('^([^ ]+ ){2,2}([^ ]+) ', '\\2') | first }}"
+    # Network interface (currenty that variable holds the route line)
+    network_interface: "{{ network_interface.stdout | regex_search('dev ([^ ]+) ', '\\1') | first }}"
     # Root partition is the third partition of the install device
     root_partition: "{{ install_device }}3"
     # Bootleader var to lower case, just to be sure
     bootloader: "{{ bootloader|lower }}"
-    # Whether hpet is available
-    hpet_available: "{{ hpet_check.changed }}"
+    # Default list of kernel parameters
+    kernel_parameters: "{{ ['rw'] }}"
   tags:
     - arch2disk
 
@@ -163,14 +168,38 @@
     - efi_size_check
     - quick_exit
 
+# Add kernel parameters =======================================================
+
+# HPET ........................................................................
+- name: Check for hpet
+  check_mode: yes  # = don't actually do anything
+  replace:
+    path: /sys/devices/system/clocksource/clocksource0/available_clocksource
+    regexp: \shpet\s
+    # Act like replacing "hpet", to possibly get a "changed" result
+    replace: x
+  register: hpet_check
+  tags:
+    - arch2disk
+    - hpet
+
+- name: Add hpet to kernel parameter
+  set_fact:
+    kernel_parameters: "{{ kernel_parameters + ['clocksource=hpet'] }}"
+  tags:
+    - arch2disk
+    - hpet
+
 # Debug the facts that are set above...........................................
 - name: Debug facts
   debug:
     msg: |
       Printing derived facts
       cpu_vendor: {{ cpu_vendor }}
+      network_interface: {{ network_interface }}
       root_partition: {{ root_partition }}
       swap_size: {{ swap_size }}
+      kernel_parameters: {{ kernel_parameters }}
   tags:
     # Do not run by default
     - never
