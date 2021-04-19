@@ -25,7 +25,7 @@
     mode: 0700
     owner: root
     group: root
-  when: root_copy_allowed_keys
+  when: root_copy_authorized_keys
   tags:
     - root_ssh
 
@@ -37,7 +37,7 @@
     mode: 0600
     owner: root
     group: root
-  when: root_copy_allowed_keys
+  when: root_copy_authorized_keys
   tags:
     - root_ssh
 
