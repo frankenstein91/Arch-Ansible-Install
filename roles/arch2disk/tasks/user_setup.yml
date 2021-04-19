@@ -12,9 +12,7 @@
     - root_passwd
 
 - name: Set root password
-  user:
-    name: root
-    password: "{{ rootpasswd | password_hash('sha512') }}"
+  shell: echo "root:{{ rootpasswd }}" | chpasswd
   tags:
     - root_passwd
 
@@ -50,6 +48,7 @@
 
 - name: Create initial user
   command: arch-chroot /mnt useradd --create-home --user-group --groups wheel {{ initial_user_name }} --password {{ initial_user_pass }}
+  when: initial_user_pass | default('', true) | length == 0
   tags:
     - initial_user
 
