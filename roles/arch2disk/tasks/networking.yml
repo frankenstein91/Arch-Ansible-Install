@@ -44,7 +44,7 @@
   template:
     dest: /mnt/etc/NetworkManager/system-connections/temp-setup.nmconnection
     src: etc/NetworkManager/system-connections/temp-setup.nmconnection
-    mode: 0644
+    mode: 0600
     group: root
     owner: root
   tags:

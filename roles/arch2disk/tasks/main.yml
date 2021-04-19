@@ -68,7 +68,7 @@
   # That way always the defaults are chosen
   command: >
     pacstrap /mnt base
-    wget git
+    wget git nano vim
     efibootmgr efitools
     linux linux-firmware sudo
     openssh networkmanager

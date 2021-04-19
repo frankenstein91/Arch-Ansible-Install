@@ -15,7 +15,7 @@ mac-address-blacklist=
 {% if ":" in network_target_ip %}
 {% set ipv = "6" %}{% set ipvs = "4" %}
 {% else %}
-{% set ipv = "4" %}{% set ipvs = "5" %}
+{% set ipv = "4" %}{% set ipvs = "6" %}
 {% endif %}
 
 [ipv{{ ipv }}]
