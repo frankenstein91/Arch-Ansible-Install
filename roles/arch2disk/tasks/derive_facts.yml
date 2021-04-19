@@ -119,7 +119,6 @@
   register: network_interface
   tags:
     - arch2disk
-    - networking
 
 # This is needed, because $SSH_CONNECTION does not display the subnet prefix
 - name: Get current network address information
@@ -127,7 +126,12 @@
   register: network_address
   tags:
     - arch2disk
-    - networking
+
+- name: Get current route
+  command: "ip r"
+  register: network_routes
+  tags:
+    - arch2disk
 
 # Various .....................................................................
 - name: Set some facts
@@ -143,6 +147,8 @@
     network_target_ip: "{{ network_address.stdout | regex_search(' (' + addr_escaped + '/[^ ]+) ', '\\1') | first }}"
     # Network interface (currenty that variable holds the route line)
     network_interface: "{{ network_interface.stdout | regex_search('dev ([^ ]+) ', '\\1') | first }}"
+    # Default gateway
+    network_default_gateway: "{{ network_routes.stdout | regex_search('default via ([^ ]+) ', '\\1') | first }}"
     # Root partition is the third partition of the install device
     root_partition: "{{ install_device }}3"
     # Bootleader var to lower case, just to be sure

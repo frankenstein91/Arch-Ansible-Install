@@ -20,7 +20,7 @@ mac-address-blacklist=
 
 [ipv{{ ipv }}]
 method=manual
-address1={{ network_target_ip }}
+address1={{ network_target_ip }},{{ network_default_gateway }}
 dns=8.8.8.8
 
 [ipv{{ ipvs }}]
