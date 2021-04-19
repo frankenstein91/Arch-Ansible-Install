@@ -72,7 +72,7 @@
     efibootmgr efitools
     linux linux-firmware sudo
     openssh networkmanager
-    python
+    python pyalpm
     dosfstools btrfs-progs
     --noprogressbar
   tags:
@@ -107,6 +107,12 @@
     - arch2disk
     - localization
 
+- name: Install fonts
+  include_tasks: fonts.yml
+  tags:
+    - arch2disk
+    - fonts
+
 - name: Networking
   include_tasks:
     file: networking.yml
@@ -128,6 +134,11 @@
   tags:
     - arch2disk
     - user_setup
+
+# TODO install pikaur
+# git clone https://github.com/actionless/pikaur.git
+# cd pikaur
+# python3 ./pikaur.py -S pikaur
 
 - name: Boot setup
   include_tasks:
