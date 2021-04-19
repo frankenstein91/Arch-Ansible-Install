@@ -73,7 +73,7 @@
 
 - name: Store found host keymap
   set_fact:
-    keymap: "{{ localectl_status.stdout | regex_search('Keymap:\\s*(.*)$', '\\1', multiline=True) }}"
+    keymap: "{{ localectl_status.stdout | regex_search('Keymap:\\s*(.*)$', '\\1', multiline=True) | first }}"
   when: (keymap | default('', true) | length == 0) and (localectl_status.rc == 0)
   tags:
     - arch2disk
@@ -110,24 +110,45 @@
     - hostname
 
 # Currently used network connection ...........................................
+
 # TODO maybe this is doable with ansible facts?
+
 # What we do here is to query the route to the control machine (ssh client IP)
 - name: Currently used network interface
   shell: "ip route get {{ ansible_env.SSH_CONNECTION | regex_search('^([^ ]+) ', '\\1') | first }}"
   register: network_interface
   tags:
     - arch2disk
-    - networking
+
+# This is needed, because $SSH_CONNECTION does not display the subnet prefix
+- name: Get current network address information
+  command: "ip a"
+  register: network_address
+  tags:
+    - arch2disk
+
+- name: Get current route
+  command: "ip r"
+  register: network_routes
+  tags:
+    - arch2disk
 
 # Various .....................................................................
 - name: Set some facts
+  vars:
+    addr_no_prefix: "{{ ansible_env.SSH_CONNECTION | regex_search('^([^ ]+ ){2,2}([^ ]+) ', '\\2') | first }}"
+    addr_escaped: "{{ addr_no_prefix | regex_escape() }}"
   set_fact:
     # Find out CPU vendor for microcode
     cpu_vendor: "{{ ansible_facts['processor'] | select('match','^(?!\\d).*') | first }}"
     # IP of the target machine via ssh client variable lookup
-    network_target_ip: "{{ ansible_env.SSH_CONNECTION | regex_search('^([^ ]+ ){2,2}([^ ]+) ', '\\2') | first }}"
+    network_target_ip_no_prefix: "{{ addr_no_prefix }}"
+    # Same with subnet prefix length specified
+    network_target_ip: "{{ network_address.stdout | regex_search(' (' + addr_escaped + '/[^ ]+) ', '\\1') | first }}"
     # Network interface (currenty that variable holds the route line)
     network_interface: "{{ network_interface.stdout | regex_search('dev ([^ ]+) ', '\\1') | first }}"
+    # Default gateway
+    network_default_gateway: "{{ network_routes.stdout | regex_search('default via ([^ ]+) ', '\\1') | first }}"
     # Root partition is the third partition of the install device
     root_partition: "{{ install_device }}3"
     # Bootleader var to lower case, just to be sure

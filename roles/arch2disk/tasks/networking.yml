@@ -42,9 +42,9 @@
 
 - name: Copy NetworkManager static IP config
   template:
-    dest: /mnt/etc/NetworkManager/system-connections
-    src: etc/NetworkManager/system-connections
-    mode: 0644
+    dest: /mnt/etc/NetworkManager/system-connections/temp-setup.nmconnection
+    src: etc/NetworkManager/system-connections/temp-setup.nmconnection
+    mode: 0600
     group: root
     owner: root
   tags:
