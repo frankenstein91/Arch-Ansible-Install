@@ -25,7 +25,7 @@
 - name: Verify UEFI boot mode
   fail:
     msg: System is required to boot with efi
-  when: efivars_stat.stat.exists == False
+  when: efivars_stat.stat.exists
   tags:
     - arch2disk
     - efi_vars_check
@@ -116,6 +116,7 @@
 # What we do here is to query the route to the control machine (ssh client IP)
 - name: Currently used network interface
   shell: "ip route get {{ ansible_env.SSH_CONNECTION | regex_search('^([^ ]+) ', '\\1') | first }}"
+  changed_when: false
   register: network_interface
   tags:
     - arch2disk
@@ -123,12 +124,14 @@
 # This is needed, because $SSH_CONNECTION does not display the subnet prefix
 - name: Get current network address information
   command: "ip a"
+  changed_when: false
   register: network_address
   tags:
     - arch2disk
 
 - name: Get current route
   command: "ip r"
+  changed_when: false
   register: network_routes
   tags:
     - arch2disk

@@ -113,17 +113,6 @@
     - arch2disk
     - fonts
 
-- name: Install pikaur
-  # Install pikaur using pikaur
-  shell: |
-    cd /tmp
-    git clone https://github.com/actionless/pikaur.git
-    cd pikaur
-    python3 ./pikaur.py -S pikaur --noconfirm
-  tags:
-    - arch2disk
-    - pikaur
-
 - name: Networking
   include_tasks:
     file: networking.yml
@@ -163,3 +152,16 @@
     - arch2disk
     - boot_setup
     - reboot
+
+- name: Install pikaur
+  # Install pikaur using pikaur
+  shell: |
+    cd /tmp
+    git clone https://github.com/actionless/pikaur.git
+    cd pikaur
+    python3 ./pikaur.py -S pikaur --noconfirm
+  args:
+    creates: /usr/bin/pikaur
+  tags:
+    - arch2disk
+    - pikaur

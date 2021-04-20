@@ -4,6 +4,8 @@
 
 - name: Set timezone
   command: arch-chroot /mnt ln -sf /usr/share/zoneinfo/{{ timezone }} /etc/localtime
+  args:
+    creates: /etc/localtime
   tags:
     - set_time
 
