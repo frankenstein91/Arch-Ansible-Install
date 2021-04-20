@@ -1,0 +1,33 @@
+###############################################################################
+# Install Gnome shell on wayland
+###############################################################################
+
+- name: Install wayland, gnome-shell and gdm
+  pacman:
+    name:
+      - wayland
+      - gdm
+      - gnome-shell
+  tags:
+    - gnome_shell
+
+- name: Disable gnome xsession
+  command: mv /usr/share/xsessions/gnome.desktop /usr/share/xsessions/gnome.desktop.disabled
+  args:
+    removes: /usr/share/xsessions/gnome.desktop
+  tags:
+    - gnome_shell
+
+- name: Enable and start gdm
+  systemd:
+    name: gdm
+    state: started
+    enabled: yes
+  tags:
+    - gnome_shell
+
+- name: Install appindicator and xdg-desktop-portal
+  pacman:
+    name:
+      - gnome-shell-extension-appindicator
+      - xdg-desktop-portal-gtk

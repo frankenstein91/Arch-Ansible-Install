@@ -2,4 +2,5 @@
   roles:
     - arch2disk
     - pipewire
+    - gnome_shell
     - multimedia
