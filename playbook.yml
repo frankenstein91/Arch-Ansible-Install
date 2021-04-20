@@ -21,6 +21,7 @@
         name:
           - seahorse
           - qalculate-gtk
+          - geogebra
           - firefox
           - firefox-ublock-origin
           # TODO install correct firefox language package...
