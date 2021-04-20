@@ -1,0 +1,10 @@
+###############################################################################
+# Install multimedia libs and application
+# for any ArchLinux workstation
+###############################################################################
+
+- name: Install multimedia libs and apps
+  pacman:
+    name: ffmpeg
+  tags:
+    - multimedia

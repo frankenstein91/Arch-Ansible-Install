@@ -2,3 +2,4 @@
   roles:
     - arch2disk
     - pipewire
+    - multimedia
