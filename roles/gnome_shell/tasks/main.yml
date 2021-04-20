@@ -26,8 +26,9 @@
   tags:
     - gnome_shell
 
-- name: Install appindicator and xdg-desktop-portal
+- name: Install appindicator, xdg-desktop-portal and xdg-user-dirs
   pacman:
     name:
       - gnome-shell-extension-appindicator
       - xdg-desktop-portal-gtk
+      - xdg-user-dirs
