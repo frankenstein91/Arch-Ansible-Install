@@ -1,0 +1,16 @@
+###############################################################################
+# Install Pipewire on ArchLinux
+# Also its pulseaudio and jack support
+###############################################################################
+
+- name: Install systemd-boot update transaction hook
+  aur:
+    use: pikaur
+    name:
+      - pipewire
+      - pipewire-alsa
+      - pipewire-pulse
+      - pipewire-jack
+      - pipewire-jack-dropin
+  tags:
+    - pipewire
