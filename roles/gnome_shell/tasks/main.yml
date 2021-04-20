@@ -26,9 +26,14 @@
   tags:
     - gnome_shell
 
-- name: Install appindicator, xdg-desktop-portal and xdg-user-dirs
+- name: Install useful gnome desktop applications
   pacman:
     name:
       - gnome-shell-extension-appindicator
       - xdg-desktop-portal-gtk
       - xdg-user-dirs
+      - nautilus
+      - nautilus-sendto
+  tags:
+    - gnome_shell
+    - apps

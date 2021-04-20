@@ -4,3 +4,27 @@
     - pipewire
     - gnome_shell
     - multimedia
+    - kewlfft.aur  # Role meta to let Ansible know, that this is a dependency
+  tasks:
+    # These things would not make sense in separate roles...
+    # Some not even in separate taskfiles...
+    - name: Install JRE (OpenJDK)
+      # Install explicitely to prevent pacman from asking which java to install
+      pacman:
+        state: present
+        name: jre-openjdk
+    - include_tasks: tasks/libreoffice-fresh.yml
+    - name: Install applications
+      aur:
+        state: present
+        use: pikaur
+        name:
+          - seahorse
+          - qalculate-gtk
+          - firefox
+          - firefox-ublock-origin
+          # TODO install correct firefox language package...
+          - gimp
+          - gimp-plugin-gmic
+          # TODO install gimp help for correct language, e.g. gimp-help-de
+    # TODO add cups
