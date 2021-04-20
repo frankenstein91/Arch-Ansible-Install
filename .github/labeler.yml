@@ -8,6 +8,21 @@ handlers:
 tasks:
   - roles/arch2disk/tasks/**/*
 GitHub:
-  - .github/**/*
+  - .github/**
 Documentation:
-  - Documentation/**
+  - Documentation/**/*
+  - readme.md
+
+# More specific task file changes
+feature/boot_setup:
+  - roles/arch2disk/tasks/boot_setup.yml
+  - roles/arch2disk/tasks/bootloader/**
+  - roles/arch2disk/templates/bootloader/**
+feature/networking:
+  - roles/arch2disk/tasks/networking.yml
+  - roles/arch2disk/templates/etc/NetworkManager/**
+  - roles/arch2disk/templates/etc/hosts
+feature/localization:
+  - roles/arch2disk/tasks/localization.yml
+  - roles/arch2disk/templates/etc/locale.conf
+  - roles/arch2disk/templates/etc/vconsole.conf
