@@ -91,7 +91,7 @@
 
 # Hostname ....................................................................
 
-- name: Generate default hostname if not set
+- name: Generate default hostname if not set # noqa risky-shell-pipe
   shell: cat /sys/class/net/*/address | sha512sum | head -c 10
   when: hostname | default('', true) | length == 0
   register: default_hostname
