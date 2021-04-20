@@ -50,7 +50,7 @@
 
 # Would be nice to have a script doing this without a country code
 # AUR pkg rate-arch-mirrors takes too long to compile+install...
-- name: Use rankmirrors to filter the fastest mirrors that support HTTPS
+- name: Use rankmirrors to filter the fastest mirrors that support HTTPS # noqa risky-shell-pipe
   shell: >
     curl -s "https://archlinux.org/mirrorlist/?protocol=https&use_mirror_status=on&country={{ locale_country|upper }}"
     | sed -e 's/^#Server/Server/' -e '/^#/d'
@@ -79,7 +79,7 @@
     - arch2disk
     - pacstrap
 
-- name: Install base development tools
+- name: Install base development tools # noqa risky-shell-pipe
   # pacstrap doesn't like groups
   shell: arch-chroot /mnt bash -c "yes '' | pacman -S base-devel --noconfirm"
   tags:
