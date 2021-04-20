@@ -30,6 +30,9 @@
       wifi.scan-rand-mac-address=yes
       [connection-mac-randomization]
       wifi.cloned-mac-address=stable
+    mode: 0644
+    owner: root
+    group: root
   tags:
     - networkmanager
     - wifi
@@ -37,6 +40,8 @@
 # Enable NetworkManager
 - name: Enable NetworkManager
   command: arch-chroot /mnt systemctl enable NetworkManager.service
+  args:
+    creates: /mnt/etc/systemd/system/multi-user.target.wants/NetworkManager.service
   tags:
     - networkmanager
 
@@ -54,5 +59,7 @@
 # Enable SSH server
 - name: Enable sshd
   command: arch-chroot /mnt systemctl enable sshd
+  args:
+    creates: /mnt/etc/systemd/system/multi-user.target.wants/sshd.service
   tags:
     - sshd

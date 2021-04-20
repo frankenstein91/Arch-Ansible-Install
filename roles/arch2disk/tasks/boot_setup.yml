@@ -17,7 +17,7 @@
   tags:
     - initramfs
 
-- name: Re-generate initframfs
+- name: Re-generate initframfs  # noqa no-handler
   command: arch-chroot /mnt mkinitcpio -p linux
   when: mkinitcpio_hooks_adjust.changed
   tags:
