@@ -157,15 +157,10 @@
     - boot_setup
     - reboot
 
-- name: Install pikaur
-  # Install pikaur using pikaur
-  shell: |
-    cd /tmp
-    git clone https://github.com/actionless/pikaur.git
-    cd pikaur
-    python3 ./pikaur.py -S pikaur --noconfirm
-  args:
-    creates: /usr/bin/pikaur
-  tags:
-    - arch2disk
-    - pikaur
+- name: Post reboot tasks
+  include_tasks:
+    file: post_reboot.yml
+    apply:
+      tags:
+        - arch2disk
+        - post_reboot
