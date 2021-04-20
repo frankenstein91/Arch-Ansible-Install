@@ -160,6 +160,7 @@
     git clone https://github.com/actionless/pikaur.git
     cd pikaur
     python3 ./pikaur.py -S pikaur --noconfirm
+  creates: /usr/bin/pikaur
   tags:
     - arch2disk
     - pikaur
