@@ -116,6 +116,8 @@
 # What we do here is to query the route to the control machine (ssh client IP)
 - name: Currently used network interface
   shell: "ip route get {{ ansible_env.SSH_CONNECTION | regex_search('^([^ ]+) ', '\\1') | first }}"
+  args:
+    changed_when: false
   register: network_interface
   tags:
     - arch2disk
@@ -123,12 +125,16 @@
 # This is needed, because $SSH_CONNECTION does not display the subnet prefix
 - name: Get current network address information
   command: "ip a"
+  args:
+    changed_when: false
   register: network_address
   tags:
     - arch2disk
 
 - name: Get current route
   command: "ip r"
+  args:
+    changed_when: false
   register: network_routes
   tags:
     - arch2disk
