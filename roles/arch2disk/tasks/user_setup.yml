@@ -56,5 +56,8 @@
   copy:
     content: "%wheel ALL=(ALL) NOPASSWD: ALL"
     dest: /mnt/etc/sudoers.d/wheel
+    mode: 0600
+    owner: root
+    group: root
   tags:
     - sudo

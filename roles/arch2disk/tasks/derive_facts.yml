@@ -25,7 +25,7 @@
 - name: Verify UEFI boot mode
   fail:
     msg: System is required to boot with efi
-  when: efivars_stat.stat.exists == False
+  when: efivars_stat.stat.exists
   tags:
     - arch2disk
     - efi_vars_check
