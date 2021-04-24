@@ -8,6 +8,7 @@
     # These things would not make sense in separate roles...
     # Some not even in separate taskfiles...
     - include_tasks: tasks/wallpaper.yml
+    - include_tasks: tasks/cups.yml
     - name: Install JRE (OpenJDK)
       # Install explicitely to prevent pacman from asking which java to install
       pacman:
@@ -30,7 +31,6 @@
           - hunspell
           - hyphen
           - libmythes
-    - include_tasks: tasks/cups.yml
     - include_tasks: tasks/kara.yml
     - name: Find out language if not set
       set_fact:
