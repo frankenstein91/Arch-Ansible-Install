@@ -13,6 +13,14 @@
   tags:
     - cups
 
+# Make sure the hook dir exists
+- name: Ensure pacman hook dir existance
+  file:
+    path: /etc/pacman.d/hooks/
+    state: directory
+  tags:
+    - cups
+
 - name: Add update hook
   copy:
     dest: /etc/pacman.d/hooks/100-gutenprint-update.hook
