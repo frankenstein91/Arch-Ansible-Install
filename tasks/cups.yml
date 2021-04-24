@@ -40,15 +40,15 @@
   tags:
     - cups
 
-- name: Add PDF printer to CUPS
-  command: lpadmin -p pdf -v "cups-pdf:/" -E -i /usr/share/cups/model/CUPS-PDF_noopt.ppd
-  tags:
-    - cups
-
 - name: Enable CUPS
   systemd:
     name: cups.service
     state: started
     enabled: yes
+  tags:
+    - cups
+
+- name: Add PDF printer to CUPS
+  command: lpadmin -p pdf -v "cups-pdf:/" -E -i /usr/share/cups/model/CUPS-PDF_noopt.ppd
   tags:
     - cups
