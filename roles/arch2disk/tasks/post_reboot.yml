@@ -1,0 +1,20 @@
+#==============================================================================
+#  Post-reboot tasks
+# These tasks can't run before reboot because of various reasons
+#==============================================================================
+
+- name: Install pikaur
+  # Install pikaur using pikaur
+  shell: |
+    cd /tmp
+    git clone https://github.com/actionless/pikaur.git
+    cd pikaur
+    python3 ./pikaur.py -S pikaur --noconfirm
+  args:
+    creates: /usr/bin/pikaur
+
+- name: Install systemd-boot update transaction hook
+  aur:
+    name: systemd-boot-pacman-hook
+    use: pikaur
+  when: bootloader=="systemd-boot"

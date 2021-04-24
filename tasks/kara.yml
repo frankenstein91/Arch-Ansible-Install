@@ -1,0 +1,44 @@
+# Install kara
+# https://www.swisseduc.ch/informatik/karatojava/index.html
+
+- name: Create Kara installation directory
+  file:
+    path: /opt/kara
+    state: directory
+  tags:
+    - kara
+
+- name: Download Kara 1/2
+  get_url:
+    url: https://www.swisseduc.ch/informatik/karatojava/kara/classes/kara.jar
+    dest: /opt/kara/kara.jar
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Download Kara 2/2
+  get_url:
+    url: https://www.swisseduc.ch/informatik/karatojava/kara/icons/kara-large.png
+    dest: /opt/kara/kara.png
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create Kara desktop entry
+ # Maybe this should be a proper role, than also adding a icon would be possible
+  copy:
+    dest: /usr/share/applications/kara.desktop
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Name=Kara
+      GenericName=Kara
+      Comment=Environment to learn programming
+      Icon=/opt/kara/kara.png
+      Exec=/usr/bin/java -jar /opt/kara/kara.jar
+      Terminal=false
+      Categories=Development;
+      Keywords=Development;Learning
+      StartupNotify=false
+  tags:
+    - kara
