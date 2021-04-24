@@ -9,6 +9,8 @@
     # Some not even in separate taskfiles...
     - include_tasks: tasks/wallpaper.yml
     - include_tasks: tasks/cups.yml
+      tags:
+        - cups
     - name: Install JRE (OpenJDK)
       # Install explicitely to prevent pacman from asking which java to install
       pacman:
@@ -32,14 +34,25 @@
           - hunspell
           - hyphen
           - libmythes
+      tags:
+        - applications
     - include_tasks: tasks/kara.yml
+      tags:
+        - kara
+        - applications
     - name: Find out language if not set
       set_fact:
         locales:
           - "{{ lookup('env', 'LANG') }}"
       when: locales|default('', true)|length == 0
+      tags:
+        - language_packages
+        - applications
     - name: Install language packages
       include_tasks: tasks/try-install.yml
+      apply:
+        tags:
+          - language_packages
       vars:
         lang: "{{ locales[0].split('_')[0] }}"
       loop:
@@ -51,3 +64,4 @@
         - "gimp-help-{{ lang }}"
       tags:
         - language_packages
+        - applications
