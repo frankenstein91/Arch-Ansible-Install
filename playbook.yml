@@ -48,3 +48,5 @@
         - "hyphen-{{ lang }}"
         - "mythes-{{ lang }}"
         - "gimp-help-{{ lang }}"
+      tags:
+        - language_packages

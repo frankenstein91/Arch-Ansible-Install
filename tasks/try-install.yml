@@ -3,9 +3,9 @@
 
 - name: Try to install {{ item }}
   block:
-    pacman:
-      state: present
-      name: "{{ item }}"
+    - pacman:
+        state: present
+        name: "{{ item }}"
   rescue:
     - debug:
         msg: Installation of {{ item }} failed
