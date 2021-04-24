@@ -49,10 +49,11 @@
         - language_packages
         - applications
     - name: Install language packages
-      include_tasks: tasks/try-install.yml
-      apply:
-        tags:
-          - language_packages
+      include_tasks:
+        file: tasks/try-install.yml
+        apply:
+          tags:
+            - language_packages
       vars:
         lang: "{{ locales[0].split('_')[0] }}"
       loop:
