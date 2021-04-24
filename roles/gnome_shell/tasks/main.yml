@@ -33,6 +33,10 @@
       - xdg-desktop-portal-gtk
       - xdg-user-dirs
       - nautilus
+      - tumbler
+      - ffmpegthumbnailer
+      - raw-thumbnailer
+      - gnome-epub-thumbnailer
       - gnome-control-center
   tags:
     - gnome_shell
