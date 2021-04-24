@@ -1,0 +1,31 @@
+# Set gnome shell wallpaper
+
+- name: Ensure directory existance
+  file:
+    path: /usr/local/share/backgrounds/
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - wallpaper
+
+- name: Copy wallpaper
+  copy:
+    src: pictures/wallpaper.png
+    dest: /usr/local/share/backgrounds/wallpaper.png
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - wallpaper
+
+- name: Set gnome shell wallpaper
+  # https://help.gnome.org/admin/system-admin-guide/stable/desktop-background.html.en
+  # && https://docs.ansible.com/ansible/2.9/modules/dconf_module.html
+  dconf:
+    key: "org/gnome/desktop/background"
+    value: "['picture-uri', 'file:///usr/local/share/backgrounds/wallpaper.jpg']"
+  tags:
+    - gnome_shell
+    - wallpaper
