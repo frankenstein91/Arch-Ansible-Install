@@ -25,6 +25,9 @@
           - qalculate-gtk
           - geogebra
           - evince
+          - geany
+          - geany-plugins
+          - geany-themes
           - firefox
           - firefox-ublock-origin
           - gimp
