@@ -100,6 +100,14 @@
     - arch2disk
     - fstab
 
+# Make sure the hook dir exists
+- name: Ensure pacman hook dir existance
+  file:
+    path: /etc/pacman.d/hooks/
+    state: directory
+  tags:
+    - arch2disk
+
 - name: System localization
   include_tasks:
     file: localization.yml

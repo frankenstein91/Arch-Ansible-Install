@@ -1,0 +1,41 @@
+# Install CUPS
+
+- name: Install CUPS
+  pacman:
+    state: present
+    name:
+      - cups
+      - cups-pdf
+      - ghostscript  # Often needed
+      - gsfonts  # Some printers don't work without this
+      - gutenprint  # Printer drivers
+      - foomatic-db-gutenprint-ppds  # PPD (printer description) files
+  tags:
+    - cups
+
+- name: Add update hook
+  copy:
+    dest: /etc/pacman.d/hooks/100-gutenprint-update.hook
+    content: |
+      [Trigger]
+      Type = Package
+      Operation = Upgrade
+      Target = gutenprint
+
+      [Action]
+      Description = Updating gutenprint PPD files
+      When = PostTransaction
+      Exec = /usr/bin/cups-genppdupdate
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - cups
+
+- name: Enable CUPS
+  systemd:
+    name: cups.service
+    state: started
+    enabled: yes
+  tags:
+    - cups

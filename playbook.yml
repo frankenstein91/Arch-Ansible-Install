@@ -30,8 +30,8 @@
           - hunspell
           - hyphen
           - libmythes
-    # TODO add cups
-    # TODO add kara
+    - include_tasks: tasks/cups.yml
+    # - include_tasks: tasks/kara.yml
     - name: Find out language if not set
       set_fact:
         locales:
