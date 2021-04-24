@@ -1,7 +1,0 @@
-- name: Install Gimp
-  pacman:
-    state: present
-    name:
-      - gimp
-      - gimp-plugin-gmic
-      # TODO install help for correct language, e.g. gimp-help-de

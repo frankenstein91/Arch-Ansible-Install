@@ -14,7 +14,6 @@
       pacman:
         state: present
         name: jre-openjdk
-    - include_tasks: tasks/libreoffice-fresh.yml
     - name: Install applications
       aur:
         state: present
@@ -24,8 +23,28 @@
           - qalculate-gtk
           - firefox
           - firefox-ublock-origin
-          # TODO install correct firefox language package...
           - gimp
           - gimp-plugin-gmic
-          # TODO install gimp help for correct language, e.g. gimp-help-de
+          - libreoffice-fresh
+          - libreoffice-extension-languagetool
+          - hunspell
+          - hyphen
+          - libmythes
     # TODO add cups
+    # TODO add kara
+    - name: Find out language if not set
+      set_fact:
+        locales:
+          - "{{ lookup('env', 'LANG') }}"
+      when: locales|default('', true)|length == 0
+    - name: Install language packages
+      include_tasks: tasks/try-install.yml
+      vars:
+        lang: "{{ locales[0].split('_')[0] }}"
+      loop:
+        - "firefox-i18n-{{ lang }}
+        - "libreoffice-fresh-{{ lang }}
+        - "hunspell-{{ lang }}
+        - "hyphen-{{ lang }}
+        - "mythes-{{ lang }}
+        - "gimp-help-{{ lang }}
