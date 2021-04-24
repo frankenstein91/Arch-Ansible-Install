@@ -72,7 +72,7 @@
     efibootmgr efitools
     linux linux-firmware sudo
     openssh networkmanager
-    python pyalpm
+    python pyalpm python-psutil
     dosfstools btrfs-progs
     --noprogressbar
   args:
