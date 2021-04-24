@@ -38,6 +38,9 @@
       - raw-thumbnailer
       - gnome-epub-thumbnailer
       - gnome-control-center
+      - gnome-books
   tags:
     - gnome_shell
     - apps
+
+# org.gnome.books night-mode true
