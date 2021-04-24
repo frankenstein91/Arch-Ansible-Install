@@ -28,6 +28,8 @@
           - geany
           - geany-plugins
           - geany-themes
+          - gnome-terminal
+          - glances
           - firefox
           - firefox-ublock-origin
           - gimp
