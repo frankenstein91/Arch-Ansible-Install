@@ -43,9 +43,9 @@
       vars:
         lang: "{{ locales[0].split('_')[0] }}"
       loop:
-        - "firefox-i18n-{{ lang }}
-        - "libreoffice-fresh-{{ lang }}
-        - "hunspell-{{ lang }}
-        - "hyphen-{{ lang }}
-        - "mythes-{{ lang }}
-        - "gimp-help-{{ lang }}
+        - "firefox-i18n-{{ lang }}"
+        - "libreoffice-fresh-{{ lang }}"
+        - "hunspell-{{ lang }}"
+        - "hyphen-{{ lang }}"
+        - "mythes-{{ lang }}"
+        - "gimp-help-{{ lang }}"

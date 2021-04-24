@@ -33,7 +33,7 @@
     - cups
 
 - name: Add PDF printer to CUPS
-  cmd: lpadmin -p pdf cups-pdf:/ -E -P /usr/share/ppd/cups-pdf/CUPS-PDF.ppd
+  cmd: lpadmin -p pdf cups-pdf:/ -E -P /usr/share/cups/model/CUPS-PDF_noopt.ppd
   tags:
     - cups
 
