@@ -77,6 +77,7 @@
       umount /mnt
 
 - name: Mount everything
+  # TODO this task may also have a problem with idempotency
   shell: >
       mount -o subvol=root,compress-force=zstd:{{ btrfs_compression_level }},space_cache,noatime,X-mount.mkdir,defaults
       {{ root_partition }} /mnt

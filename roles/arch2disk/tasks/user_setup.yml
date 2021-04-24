@@ -11,7 +11,7 @@
   tags:
     - root_passwd
 
-- name: Set root password
+- name: Set root password # noqa risky-shell-pipe no-changed-when
   shell: echo "root:{{ rootpasswd }}" | chpasswd
   tags:
     - root_passwd
@@ -56,5 +56,8 @@
   copy:
     content: "%wheel ALL=(ALL) NOPASSWD: ALL"
     dest: /mnt/etc/sudoers.d/wheel
+    mode: 0600
+    owner: root
+    group: root
   tags:
     - sudo

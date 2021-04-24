@@ -4,6 +4,7 @@
 
 - name: Install systemd-boot
   command: arch-chroot /mnt bootctl install
+  # TODO add creates arg for the systemd-bootx64.efi this will create
 
 # We let sytemd-boot load the linux kernel from the efi partition
 # That way we avoid lots of problems
@@ -39,5 +40,3 @@
     mode: 0644
     group: root
     owner: root
-
-# TODO add the AUR package that includes the bootctl update pacman hook

@@ -13,11 +13,13 @@
     dest: /mnt/etc/mkinitcpio.conf
     regexp: ^HOOKS
     line: HOOKS=(base systemd autodetect modconf block filesystems keyboard sd-vconsole btrfs)
+  register: mkinitcpio_hooks_adjust
   tags:
     - initramfs
 
-- name: Re-generate initframfs
+- name: Re-generate initframfs  # noqa no-handler
   command: arch-chroot /mnt mkinitcpio -p linux
+  when: mkinitcpio_hooks_adjust.changed
   tags:
     - initramfs
 

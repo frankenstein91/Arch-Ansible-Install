@@ -13,6 +13,11 @@ Documentation:
   - Documentation/**/*
   - readme.md
 
+role/arch2disk:
+  - roles/arch2disk/**
+role/pipewire:
+  - roles/pipewire/**
+
 # More specific task file changes
 feature/boot_setup:
   - roles/arch2disk/tasks/boot_setup.yml

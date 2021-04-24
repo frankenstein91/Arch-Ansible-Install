@@ -12,7 +12,7 @@
     - boot_check
     - quick_exit
 
-- name: Synchronize clock via NTP
+- name: Synchronize clock via NTP  # noqa no-changed-when
   command: timedatectl set-ntp true
   tags:
     - arch2disk
@@ -50,7 +50,7 @@
 
 # Would be nice to have a script doing this without a country code
 # AUR pkg rate-arch-mirrors takes too long to compile+install...
-- name: Use rankmirrors to filter the fastest mirrors that support HTTPS
+- name: Use rankmirrors to filter the fastest mirrors that support HTTPS # noqa risky-shell-pipe no-changed-when
   shell: >
     curl -s "https://archlinux.org/mirrorlist/?protocol=https&use_mirror_status=on&country={{ locale_country|upper }}"
     | sed -e 's/^#Server/Server/' -e '/^#/d'
@@ -72,16 +72,20 @@
     efibootmgr efitools
     linux linux-firmware sudo
     openssh networkmanager
-    python pyalpm
+    python pyalpm python-psutil
     dosfstools btrfs-progs
     --noprogressbar
+  args:
+    creates: /mnt/usr/bin/nano  # Among others of course...
   tags:
     - arch2disk
     - pacstrap
 
-- name: Install base development tools
+- name: Install base development tools # noqa risky-shell-pipe
   # pacstrap doesn't like groups
   shell: arch-chroot /mnt bash -c "yes '' | pacman -S base-devel --noconfirm"
+  args:
+    creates: /mnt/usr/bin/make  # One of the things installed...
   tags:
     - arch2disk
     - pacstrap
@@ -89,12 +93,20 @@
 
 # I now about the Ansible module to do this
 # But that would need about a thousands lines more, and is more error-prone
-# TODO this didn't work in test...
 - name: Generate fstab
   shell: genfstab -U /mnt >> /mnt/etc/fstab
+  # TODO this task doesn't warrant idempotency
   tags:
     - arch2disk
     - fstab
+
+# Make sure the hook dir exists
+- name: Ensure pacman hook dir existance
+  file:
+    path: /etc/pacman.d/hooks/
+    state: directory
+  tags:
+    - arch2disk
 
 - name: System localization
   include_tasks:
@@ -112,17 +124,6 @@
   tags:
     - arch2disk
     - fonts
-
-- name: Install pikaur
-  # Install pikaur using pikaur
-  shell: |
-    cd /tmp
-    git clone https://github.com/actionless/pikaur.git
-    cd pikaur
-    python3 ./pikaur.py -S pikaur --noconfirm
-  tags:
-    - arch2disk
-    - pikaur
 
 - name: Networking
   include_tasks:
@@ -163,3 +164,11 @@
     - arch2disk
     - boot_setup
     - reboot
+
+- name: Post reboot tasks
+  include_tasks:
+    file: post_reboot.yml
+    apply:
+      tags:
+        - arch2disk
+        - post_reboot

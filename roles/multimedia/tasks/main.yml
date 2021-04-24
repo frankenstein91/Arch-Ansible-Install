@@ -1,0 +1,26 @@
+###############################################################################
+# Install multimedia libs and application
+# for any ArchLinux workstation
+# These should be installed after a desktop environment, otherwise they
+# might pull packages as dependencies you don't want
+###############################################################################
+
+- name: Install multimedia libs and apps
+  pacman:
+    name:
+      - gstreamer
+      - gst-libav
+      - gst-plugins-base
+      - gst-plugins-good
+      - gst-plugins-ugly
+      - libde265
+      - ffmpeg
+      - qjackctl
+      - vlc
+      - libbluray
+      - protobuf
+      - libogg
+      - libvorbis
+      - aalib
+  tags:
+    - multimedia

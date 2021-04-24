@@ -4,10 +4,12 @@
 
 - name: Set timezone
   command: arch-chroot /mnt ln -sf /usr/share/zoneinfo/{{ timezone }} /etc/localtime
+  args:
+    creates: /etc/localtime
   tags:
     - set_time
 
-- name: Set hardware clock
+- name: Set hardware clock  # noqa no-changed-when
   command: arch-chroot /mnt hwclock --systohc
   tags:
     - set_time
@@ -20,7 +22,7 @@
   tags:
     - locales
 
-- name: Generate locales, step 2/2
+- name: Generate locales, step 2/2  # noqa no-changed-when
   command: arch-chroot /mnt locale-gen
   tags:
     - locales

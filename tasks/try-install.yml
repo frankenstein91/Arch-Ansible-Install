@@ -1,0 +1,11 @@
+# Helper task file:
+# Try to install a package, don't fail whole playbook on error
+
+- name: Try to install {{ item }}
+  block:
+    - pacman:
+        state: present
+        name: "{{ item }}"
+  rescue:
+    - debug:
+        msg: Installation of {{ item }} failed

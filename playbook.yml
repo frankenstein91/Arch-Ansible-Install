@@ -1,3 +1,73 @@
 - hosts: all
   roles:
     - arch2disk
+    - pipewire
+    - gnome_shell
+    - multimedia
+  tasks:
+    # These things would not make sense in separate roles...
+    # Some not even in separate taskfiles...
+    - include_tasks: tasks/wallpaper.yml
+    - include_tasks: tasks/cups.yml
+      tags:
+        - cups
+    - name: Install JRE (OpenJDK)
+      # Install explicitely to prevent pacman from asking which java to install
+      pacman:
+        state: present
+        name: jre-openjdk
+    - name: Install applications
+      aur:
+        state: present
+        use: pikaur
+        name:
+          - seahorse
+          - qalculate-gtk
+          - geogebra
+          - evince
+          - geany
+          - geany-plugins
+          - geany-themes
+          - gnome-terminal
+          - glances
+          - firefox
+          - firefox-ublock-origin
+          - gimp
+          - gimp-plugin-gmic
+          - libreoffice-fresh
+          - libreoffice-extension-languagetool
+          - hunspell
+          - hyphen
+          - libmythes
+      tags:
+        - applications
+    - include_tasks: tasks/kara.yml
+      tags:
+        - kara
+        - applications
+    - name: Find out language if not set
+      set_fact:
+        locales:
+          - "{{ lookup('env', 'LANG') }}"
+      when: locales|default('', true)|length == 0
+      tags:
+        - language_packages
+        - applications
+    - name: Install language packages
+      include_tasks:
+        file: tasks/try-install.yml
+        apply:
+          tags:
+            - language_packages
+      vars:
+        lang: "{{ locales[0].split('_')[0] }}"
+      loop:
+        - "firefox-i18n-{{ lang }}"
+        - "libreoffice-fresh-{{ lang }}"
+        - "hunspell-{{ lang }}"
+        - "hyphen-{{ lang }}"
+        - "mythes-{{ lang }}"
+        - "gimp-help-{{ lang }}"
+      tags:
+        - language_packages
+        - applications
