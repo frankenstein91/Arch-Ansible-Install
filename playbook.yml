@@ -22,6 +22,7 @@
           - seahorse
           - qalculate-gtk
           - geogebra
+          - evince
           - firefox
           - firefox-ublock-origin
           - gimp
