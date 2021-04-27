@@ -58,3 +58,14 @@
   tags:
     - gnome_shell
     - apps
+
+- name: Enable appindicator by default
+  # Proper name of the appindicator extension needed
+  # Can be found in PKGBUILD of package:
+  # appindicatorsupport@rgcjonas.gmail.com
+  dconf:
+    key: "/org/gnome/shell"
+    value: "['enabled-extensions', ['appindicatorsupport@rgcjonas.gmail.com']]"
+  tags:
+    - gnome_shell
+    - apps
