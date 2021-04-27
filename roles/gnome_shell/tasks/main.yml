@@ -20,8 +20,8 @@
 
 - name: Set gnome keyboard layout
   dconf:
-    key: "/org/gnome/desktop/input-sources"
-    value: "['sources', [('xkb', 'de')]]"
+    key: "/org/gnome/desktop/input-sources/sources"
+    value: "[('xkb', '{{ keymap }}')]"
   when: keymap|default('', true)|length == 0
   tags:
     - gnome_shell
@@ -33,8 +33,8 @@
   # Another possibility would be to enlarge the timeout
   # See https://wiki.archlinux.org/index.php/GNOME#Power
   dconf:
-    key: "/org/gnome/settings-daemon/plugins/power"
-    value: "['sleep-inactive-ac-type', 'nothing']"
+    key: "/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type"
+    value: "'nothing'"
   tags:
     - gnome_shell
     - gnome_disable_sleep
@@ -64,8 +64,8 @@
   # Can be found in PKGBUILD of package:
   # appindicatorsupport@rgcjonas.gmail.com
   dconf:
-    key: "/org/gnome/shell"
-    value: "['enabled-extensions', ['appindicatorsupport@rgcjonas.gmail.com']]"
+    key: "/org/gnome/shell/enabled-extensions"
+    value: "['appindicatorsupport@rgcjonas.gmail.com']"
   tags:
     - gnome_shell
     - apps
