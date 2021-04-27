@@ -3,6 +3,23 @@
 # These tasks can't run before reboot because of various reasons
 #==============================================================================
 
+# Reset network to normal .....................................................
+- name: Copy auto connection profile
+  template:
+    dest: /etc/NetworkManager/system-connections/auto.nmconnection
+    src: etc/NetworkManager/system-connections/auto.nmconnection
+    mode: 0600
+    group: root
+    owner: root
+  tags:
+    - networkmanager
+
+- name: Delete temporary network connection profile
+  file:
+    state: absent
+    path: /etc/NetworkManager/system-connections/temp-setup.nmconnection
+
+# Install AUR packages ........................................................
 - name: Install pikaur
   # Install pikaur using pikaur
   shell: |
