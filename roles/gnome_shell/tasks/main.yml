@@ -18,6 +18,15 @@
   tags:
     - gnome_shell
 
+- name: Set gnome keyboard layout
+  dconf:
+    key: "/org/gnome/desktop/input-sources"
+    value: "['sources', [('xkb', 'de')]]"
+  when: keymap|default('', true)|length == 0
+  tags:
+    - gnome_shell
+    - keymap
+
 - name: Enable and start gdm
   systemd:
     name: gdm
