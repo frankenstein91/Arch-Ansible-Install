@@ -27,6 +27,18 @@
     - gnome_shell
     - keymap
 
+- name: Disable sleep on inactivity
+  # Sleep on inactivity can be a problem when installation with Ansible is slow
+  # The sleep is completely disabled here
+  # Another possibility would be to enlarge the timeout
+  # See https://wiki.archlinux.org/index.php/GNOME#Power
+  dconf:
+    key: "/org/gnome/settings-daemon/plugins/power"
+    value: "['sleep-inactive-ac-type', 'nothing']"
+  tags:
+    - gnome_shell
+    - gnome_disable_sleep
+
 - name: Enable and start gdm
   systemd:
     name: gdm
