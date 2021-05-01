@@ -3,8 +3,8 @@
 # These tasks can't run before reboot because of various reasons
 #==============================================================================
 
- - name: Synchronize clock via NTP  # noqa no-changed-when
-   command: timedatectl set-ntp true
+- name: Synchronize clock via NTP  # noqa no-changed-when
+  command: timedatectl set-ntp true
 
 - name: Install pikaur
   # Install pikaur using pikaur
