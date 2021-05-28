@@ -18,11 +18,30 @@
   tags:
     - gnome_shell
 
+- name: Try to find out host keymap
+  command: localectl status
+  delegate_to: localhost
+  failed_when: false
+  changed_when: false
+  when: keymap|default('', true)|length == 0
+  register: localectl_status
+  tags:
+    - gnome_shell
+    - keymap
+
+- name: Store found host keymap
+  set_fact:
+    keymap: "{{ localectl_status.stdout | regex_search('Keymap:\\s*(.*)$', '\\1', multiline=True) | first }}"
+  when: (keymap | default('', true) | length == 0) and (localectl_status.rc == 0)
+  tags:
+    - gnome_shell
+    - keymap
+
 - name: Set gnome keyboard layout
   dconf:
     key: "/org/gnome/desktop/input-sources/sources"
     value: "[('xkb', '{{ keymap }}')]"
-  when: keymap|default('', true)|length == 0
+  when: keymap|default('', true)|length != 0
   tags:
     - gnome_shell
     - keymap
