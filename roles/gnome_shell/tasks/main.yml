@@ -39,6 +39,16 @@
     - gnome_shell
     - gnome_disable_sleep
 
+- name: Disable idle delay
+  # Sleep on inactivity can be a problem when installation with Ansible is slow
+  # "Idle time" is disabled by setting it to 0
+  dconf:
+    key: "/org/gnome/desktop/session/idle-delay"
+    value: "0"
+  tags:
+    - gnome_shell
+    - gnome_disable_sleep
+
 - name: Enable and start gdm
   systemd:
     name: gdm
