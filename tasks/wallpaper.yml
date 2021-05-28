@@ -24,8 +24,8 @@
   # https://help.gnome.org/admin/system-admin-guide/stable/desktop-background.html.en
   # && https://docs.ansible.com/ansible/2.9/modules/dconf_module.html
   dconf:
-    key: "/org/gnome/desktop/background"
-    value: "['picture-uri', 'file:///usr/local/share/backgrounds/wallpaper.png']"
+    key: "/org/gnome/desktop/background/picture-uri"
+    value: "'file:///usr/local/share/backgrounds/wallpaper.png'"
   tags:
     - gnome_shell
     - wallpaper

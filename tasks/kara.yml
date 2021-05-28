@@ -5,6 +5,9 @@
   file:
     path: /opt/kara
     state: directory
+    owner: root
+    group: root
+    mode: 0777
   tags:
     - kara
 
@@ -40,5 +43,8 @@
       Categories=Development;
       Keywords=Development;Learning
       StartupNotify=false
+    owner: root
+    group: root
+    mode: 0644
   tags:
     - kara

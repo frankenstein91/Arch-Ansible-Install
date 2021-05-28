@@ -1,0 +1,24 @@
+[connection]
+id=Auto network connection
+uuid={{ 99999999 | random | to_uuid }}
+type=ethernet
+autoconnect-priority=0
+interface-name={{ network_interface }}
+metered=2
+permissions=
+timestamp={{ ansible_date_time.epoch }}
+
+[ethernet]
+cloned-mac-address=permanent
+mac-address-blacklist=
+
+[ipv4]
+dns-search=
+method=auto
+
+[ipv6]
+addr-gen-mode=stable-privacy
+dns-search=
+method=auto
+
+[proxy]

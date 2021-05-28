@@ -45,16 +45,15 @@
   tags:
     - networkmanager
 
-- name: Copy NetworkManager static IP config
+- name: Copy NetworkManager temporary network connection config
   template:
     dest: /mnt/etc/NetworkManager/system-connections/temp-setup.nmconnection
-    src: etc/NetworkManager/system-connections/temp-setup.nmconnection
+    src: etc/NetworkManager/system-connections/static.nmconnection
     mode: 0600
     group: root
     owner: root
   tags:
     - networkmanager
-    - static_ip
 
 # Enable SSH server
 - name: Enable sshd
