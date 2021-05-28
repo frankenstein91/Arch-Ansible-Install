@@ -19,6 +19,9 @@
     state: absent
     path: /etc/NetworkManager/system-connections/temp-setup.nmconnection
 
+- name: Synchronize clock via NTP  # noqa no-changed-when
+  command: timedatectl set-ntp true
+
 # Install AUR packages ........................................................
 - name: Install pikaur
   # Install pikaur using pikaur

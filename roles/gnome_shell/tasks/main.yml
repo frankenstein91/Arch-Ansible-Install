@@ -70,6 +70,7 @@
       - gnome-epub-thumbnailer
       - gnome-control-center
       - gnome-books
+      - gcompris-qt
   tags:
     - gnome_shell
     - apps
