@@ -7,7 +7,6 @@
   tasks:
     # These things would not make sense in separate roles...
     # Some not even in separate taskfiles...
-    - include_tasks: tasks/wallpaper.yml
     - include_tasks: tasks/cups.yml
       tags:
         - cups
