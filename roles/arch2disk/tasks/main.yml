@@ -43,19 +43,14 @@
 
 - name: Update pacman DB and install rankmirrors
   pacman:
-    name: pacman-contrib
+    name: pacman-contrib reflector
     update_cache: yes  # Update pacman database, also needed for pacstrap
   tags:
     - arch2disk
 
-# Would be nice to have a script doing this without a country code
-# AUR pkg rate-arch-mirrors takes too long to compile+install...
-- name: Use rankmirrors to filter the fastest mirrors that support HTTPS # noqa risky-shell-pipe no-changed-when
+- name: Use reflector to filter the fastest mirrors that support HTTPS # noqa no-changed-when
   shell: >
-    curl -s "https://archlinux.org/mirrorlist/?protocol=https&use_mirror_status=on&country={{ locale_country|upper }}"
-    | sed -e 's/^#Server/Server/' -e '/^#/d'
-    | rankmirrors -n 5 -
-    > /etc/pacman.d/mirrorlist
+    reflector -p https --age 12 --sort rate --score 15 -f 10 --save /etc/pacman.d/mirrorlist
   args:
     warn: false
   tags:
@@ -68,6 +63,7 @@
   # That way always the defaults are chosen
   command: >
     pacstrap /mnt base
+    pacman-contrib reflector
     wget git nano vim
     efibootmgr efitools
     linux linux-firmware sudo
@@ -80,6 +76,14 @@
   tags:
     - arch2disk
     - pacstrap
+
+# Overwrite mirrorlist with custom one
+- name: Use reflector to filter the fastest mirrors that support HTTPS # noqa no-changed-when
+  shell: >
+    reflector -p https --age 12 --sort rate --score 15 -f 10 --save /etc/pacman.d/mirrorlist
+  tags:
+    - arch2disk
+    - mirrors
 
 - name: Install base development tools # noqa risky-shell-pipe
   # pacstrap doesn't like groups

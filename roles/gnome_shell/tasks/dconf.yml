@@ -1,0 +1,112 @@
+###############################################################################
+# Default configuration
+# See https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/desktop_migration_and_administration_guide/custom-default-values-system-settings
+# Ansible dconf module seems not to work for that...
+###############################################################################
+
+# General .....................................................................
+
+- name: Create dconf profile directory
+  file:
+    path: /etc/dconf/profile/
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create user profile
+  template:
+    dest: /etc/dconf/profile/user
+    src: dconf/profile/user
+    mode: 0644
+    group: root
+    owner: root
+
+- name: Create dconf DB directory
+  file:
+    path: /etc/dconf/db/local.d/
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+# Background ..................................................................
+
+- name: Ensure wallpaper directory existance
+  file:
+    path: /usr/local/share/backgrounds/
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - wallpaper
+
+- name: Copy wallpaper
+  copy:
+    src: backgrounds/wallpaper.png
+    dest: /usr/local/share/backgrounds/wallpaper.png
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - wallpaper
+
+- name: Set default background
+  # See https://help.gnome.org/admin/system-admin-guide/stable/desktop-background.html.en
+  template:
+    dest: /etc/dconf/db/local.d/01-background
+    src: dconf/local.d/01-background
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - wallpaper
+
+# Keymap ......................................................................
+
+- name: Try to find out host keymap
+  command: localectl status
+  delegate_to: localhost
+  failed_when: false
+  changed_when: false
+  when: keymap|default('', true)|length == 0
+  register: localectl_status
+  tags:
+    - keymap
+
+- name: Store found host keymap
+  set_fact:
+    keymap: "{{ localectl_status.stdout | regex_search('Keymap:\\s*(.*)$', '\\1', multiline=True) | first }}"
+  when: (keymap | default('', true) | length == 0) and (localectl_status.rc == 0)
+  tags:
+    - keymap
+
+- name: Set default keymap
+  template:
+    dest: /etc/dconf/db/local.d/01-input-sources
+    src: dconf/local.d/01-input-sources
+    owner: root
+    group: root
+    mode: 0644
+  when: keymap|default('', true)|length != 0
+  tags:
+    - keymap
+
+# Enable extensions by default
+
+- name: Set default keymap
+  template:
+    dest: /etc/dconf/db/local.d/10-enabled-extensions
+    src: dconf/local.d/10-enabled-extensions
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - extensions
+
+# Update dconf database .......................................................
+
+- name: Update dconf database
+  command: dconf update
+  changed_when: false  # The command is idempotent...
