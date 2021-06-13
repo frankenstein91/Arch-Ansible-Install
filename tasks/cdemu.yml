@@ -1,0 +1,25 @@
+- name: Install CDemu
+  pacman:
+    state: present
+    name:
+      - cdemu-client
+      - vhba-module
+      - gcdemu
+  tags:
+    - cdemu
+
+- name: Add kernel modules
+  copy:
+    dest: /etc/modules-load.d/virtcd.conf
+    content: |
+      sg
+      sr_mod
+      vhba
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - cdemu
+
+# to-do: autostart gcdemu
+# to-do: add to workflow
