@@ -44,6 +44,10 @@
       tags:
         - kara
         - applications
+    - include_tasks: tasks/cdemu.yml
+      tags:
+        - cdemu
+        - applications
     - name: Find out language if not set
       set_fact:
         locales:
