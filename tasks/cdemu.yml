@@ -21,4 +21,47 @@
   tags:
     - cdemu
 
-# to-do: autostart gcdemu
+- name: reboot to load kernel modules
+  reboot:
+  tags:
+    - cdemu
+    - reboot
+
+- name: Add auto start of Gcdemu
+  copy:
+    dest: /etc/xdg/autostart/Gcdemu.desktop
+    content: |
+      [Desktop Entry]
+      Version=1.0
+      Name=gCDEmu
+      Name[no]=gCDEmu
+      Name[pt_BR]=gCDEmu
+      Name[ru]=gCDEmu
+      Name[sl]=gCDEmu
+      Name[sv]=gCDEmu
+      Comment=gCDEmu GUI
+      Comment[no]=gCDEmu GUI
+      Comment[pt_BR]=Interface gráfica gCDEmu
+      Comment[ru]=Графический интерфейс gCDEmu
+      Comment[sl]=CDEmu grafični vmesnik
+      Comment[sv]=gCDEmu-GUI
+      Icon=gcdemu
+      Terminal=false
+      Type=Application
+      StartupNotify=false
+      Categories=GTK;System;
+      TryExec=gcdemu
+      Exec=gcdemu
+      X-GNOME-Autostart-Phase=Applications
+      X-GNOME-Autostart-Notify=false
+      X-GNOME-Autostart-enabled=true
+      NoDisplay=false
+      Hidden=false
+      Name[de_DE]=gCDEmu
+      Comment[de_DE]=gCDEmu GUI
+      X-GNOME-Autostart-Delay=0
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - cdemu
